@@ -32,6 +32,24 @@ const utils = {
       detail
     });
     document.dispatchEvent(event);
-  }
+  },
   
+  // Key tracking functionality
+  keyCollection: {
+    keysFound: [],
+    totalKeys: 3,
+    addKey: function(keyId) {
+      if (!this.keysFound.includes(keyId)) {
+        this.keysFound.push(keyId);
+        return true;
+      }
+      return false;
+    },
+    hasAllKeys: function() {
+      return this.keysFound.length >= this.totalKeys;
+    },
+    reset: function() {
+      this.keysFound = [];
+    }
+  }
 }

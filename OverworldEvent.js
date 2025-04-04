@@ -42,11 +42,9 @@ class OverworldEvent {
       }
     }
     document.addEventListener("PersonWalkingComplete", completeHandler)
-
   }
 
   textMessage(resolve) {
-
     if (this.event.faceHero) {
       const obj = this.map.gameObjects[this.event.faceHero];
       obj.direction = utils.oppositeDirection(this.map.gameObjects["hero"].direction);
@@ -64,10 +62,21 @@ class OverworldEvent {
     resolve();
   }
 
+  // Add a new event type for removing objects
+  removeObject(resolve) {
+    const objectId = this.event.objectId;
+    if (this.map.gameObjects[objectId]) {
+      // Remove the object from walls
+      this.map.removeWall(this.map.gameObjects[objectId].x, this.map.gameObjects[objectId].y);
+      // Delete the object
+      delete this.map.gameObjects[objectId];
+    }
+    resolve();
+  }
+
   init() {
     return new Promise(resolve => {
       this[this.event.type](resolve)      
     })
   }
-
 }
