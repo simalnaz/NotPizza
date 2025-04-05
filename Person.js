@@ -30,8 +30,8 @@ class Person extends GameObject {
           direction: state.arrow
         })
       }
-      this.updateSprite(state);
     }
+    this.updateSprite(state);
   }
 
   startBehavior(state, behavior) {
@@ -52,7 +52,6 @@ class Person extends GameObject {
       //Ready to walk!
       state.map.moveWall(this.x, this.y, this.direction);
       this.movingProgressRemaining = 16;
-      this.updateSprite(state);
     }
 
     if (behavior.type === "stand") {
@@ -80,13 +79,4 @@ class Person extends GameObject {
 
       }
   }
-
-  updateSprite() {
-    if (this.movingProgressRemaining > 0) {
-      this.sprite.setAnimation("walk-"+this.direction);
-      return;
-    }
-    this.sprite.setAnimation("idle-"+this.direction);    
-  }
-
 }

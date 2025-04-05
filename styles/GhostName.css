@@ -1,0 +1,160 @@
+/* Name Guessing Menu Styles */
+.NameGuessingMenu {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    border: 4px solid #333;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 400px;
+    padding: 16px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+  }
+  
+  .NameGuessingMenu_title {
+    margin: 0 0 12px 0;
+    text-align: center;
+    font-size: 24px;
+    color: #333;
+  }
+  
+  .NameGuessingMenu_content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .NameGuessingMenu_input {
+    padding: 8px;
+    font-size: 16px;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .NameGuessingMenu_buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  
+  .NameGuessingMenu_button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    flex-grow: 1;
+  }
+  
+  .NameGuessingMenu_button--guess {
+    background-color: #4CAF50;
+    color: white;
+  }
+  
+  .NameGuessingMenu_button--guest-book {
+    background-color: #2196F3;
+    color: white;
+  }
+  
+  .NameGuessingMenu_button--cancel {
+    background-color: #f44336;
+    color: white;
+  }
+  
+  .NameGuessingMenu_hint {
+    margin-top: 12px;
+    font-size: 12px;
+    color: #666;
+    text-align: center;
+    font-style: italic;
+  }
+  
+  .NameGuessingMenu_message {
+    padding: 8px;
+    border-radius: 4px;
+    background-color: #f8f8f8;
+    border-left: 4px solid #2196F3;
+    margin: 0;
+  }
+  
+  /* Guest Book Styles */
+  .GuestBook {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #f5f3e4;
+    border: 8px solid #8b4513;
+    border-radius: 0;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    z-index: 20;
+    font-family: 'Times New Roman', serif;
+  }
+  
+  .GuestBook_header {
+    background: #8b4513;
+    color: #f5f3e4;
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+  }
+  
+  .GuestBook_header h3 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: bold;
+  }
+  
+  .GuestBook_close {
+    background: none;
+    border: none;
+    color: #f5f3e4;
+    font-size: 20px;
+    cursor: pointer;
+  }
+  
+  .GuestBook_entries {
+    padding: 10px;
+  }
+  
+  .GuestBook_entries table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .GuestBook_entries th {
+    border-bottom: 2px solid #8b4513;
+    padding: 8px;
+    text-align: left;
+    color: #5a3a0e;
+  }
+  
+  .GuestBook_entry td {
+    padding: 10px 8px;
+    border-bottom: 1px solid #d3c9b6;
+  }
+  
+  .GuestBook_entry:hover {
+    background-color: #e6e0ce;
+    cursor: pointer;
+  }
+  
+  .GuestBook_footer {
+    padding: 10px;
+    background: #e6e0ce;
+    text-align: center;
+    font-style: italic;
+    border-top: 1px solid #d3c9b6;
+    position: sticky;
+    bottom: 0;
+  }

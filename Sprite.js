@@ -27,9 +27,13 @@ class Sprite {
       "walk-down" : [ [1,0],[0,0],[3,0],[0,0], ],
       "walk-right": [ [1,1],[0,1],[3,1],[0,1], ],
       "walk-up"   : [ [1,2],[0,2],[3,2],[0,2], ],
-      "walk-left" : [ [1,3],[0,3],[3,3],[0,3], ]
+      "walk-left" : [ [1,3],[0,3],[3,3],[0,3], ],
+      "float-down" : [ [1,0],[0,0],[3,0],[0,0], ],
+      "float-right": [ [1,1],[0,1],[3,1],[0,1], ],
+      "float-up"   : [ [1,2],[0,2],[3,2],[0,2], ],
+      "float-left" : [ [1,3],[0,3],[3,3],[0,3], ]
     }
-    this.currentAnimation = "idle-right"; // config.currentAnimation || "idle-down";
+    this.currentAnimation = config.currentAnimation || "idle-down"; // config.currentAnimation || "idle-down";
     this.currentAnimationFrame = 0;
 
     this.animationFrameLimit = config.animationFrameLimit || 8;
@@ -41,7 +45,12 @@ class Sprite {
   }
 
   get frame() {
-    return this.animations[this.currentAnimation][this.currentAnimationFrame]
+    if (!this.animations[this.currentAnimation] || this.animations[this.currentAnimation].length === 0) {
+      // Handle the case where the animation is not defined or empty
+      console.warn(`Animation "${this.currentAnimation}" is not defined or empty for this sprite.`);
+      return [0, 0]; // Return a default frame
+    }
+    return this.animations[this.currentAnimation][this.currentAnimationFrame];
   }
 
   setAnimation(key) {
@@ -63,11 +72,11 @@ class Sprite {
     this.animationFrameProgress = this.animationFrameLimit;
     this.currentAnimationFrame += 1;
 
-    if (this.frame === undefined) {
-      this.currentAnimationFrame = 0
+    if (this.animations[this.currentAnimation] === undefined) {
+      this.currentAnimationFrame = 0;
+    } else if (this.currentAnimationFrame >= this.animations[this.currentAnimation].length) {
+      this.currentAnimationFrame = 0;
     }
-
-
   }
   
 

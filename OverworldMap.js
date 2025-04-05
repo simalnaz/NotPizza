@@ -229,7 +229,7 @@ window.OverworldMaps = {
           ]
         }
       ],
-      [utils.asGridCoord(5,10)]: [
+      [utils.asGridCoord(5,10)]: [ // Transition point at (5, 10)
         {
           events: [
             { type: "changeMap", map: "Kitchen" }
@@ -275,11 +275,186 @@ window.OverworldMaps = {
       [utils.asGridCoord(2,7)] : true,
     },
     cutsceneSpaces: {
-      [utils.asGridCoord(5,10)]: [
+      [utils.asGridCoord(5,10)]: [ // Transition point at (5, 10)
         {
           events: [
-            { type: "textMessage", text: "Back to the main hall?" },
-            { type: "changeMap", map: "DemoRoom" }
+            { type: "changeMap", map: "Street" }
+          ]
+        }
+      ]
+    }
+  },
+  // Add this new map to your OverworldMaps object
+  Street: { // Changed "Kitchen" to "Street"
+    lowerSrc: "/images/maps/StreetNorthLower.png", // New lower image source
+    upperSrc: "/images/maps/StreetNorthUpper.png", // New upper image source
+    gameObjects: {
+      // The player character
+      hero: new Person({
+        isPlayerControlled: true,
+        x: utils.withGrid(5),
+        y: utils.withGrid(8),
+        src: "/images/characters/people/hero.png" // Create this asset
+      }),
+      
+      // The hotel receptionist NPC to explain the mechanics
+      receptionist: new Person({
+        x: utils.withGrid(5),
+        y: utils.withGrid(5),
+        src: "/images/characters/people/npc3.png",
+        talking: [
+          {
+            events: [
+              { type: "textMessage", text: "Detective Lumen! Thank you for coming.", faceHero: "receptionist" },
+              { type: "textMessage", text: "Our hotel has been haunted by ghosts who can't remember their names." },
+              { type: "textMessage", text: "Each ghost remembers one detail about themselves." },
+              { type: "textMessage", text: "You'll need to use the hotel's guest book to match these details to names." },
+              { type: "textMessage", text: "It's like using a hash map - each detail is a key that maps to a specific name!" },
+              { type: "textMessage", text: "When you find a ghost, they'll tell you what they remember." },
+              { type: "textMessage", text: "Use that detail to look up their name in the guest book." },
+              { type: "textMessage", text: "Good luck, Detective! If you help all our ghosts, this hotel can finally be at peace." }
+            ]
+          }
+        ]
+      }),
+      
+      // Ghost 1 - Eleanor Wright
+      ghost1: new GhostName({
+        x: utils.withGrid(10),
+        y: utils.withGrid(7),
+        src: "/images/characters/people/npc4.png", // Create ghost assets
+        rememberedDetail: "bakes lemon cake",
+        id: "ghost1"
+      }),
+      
+      // Ghost 2 - Thomas Fleming
+      ghost2: new GhostName({
+        x: utils.withGrid(2),
+        y: utils.withGrid(3),
+        src: "/images/characters/people/npc1.png",
+        rememberedDetail: "carries a golden pocket watch",
+        id: "ghost2"
+      }),
+      
+      // Ghost 3 - Josephine Hayes
+      ghost3: new GhostName({
+        x: utils.withGrid(12),
+        y: utils.withGrid(10),
+        src: "/images/characters/people/npc2.png",
+        rememberedDetail: "plays the violin at midnight",
+        id: "ghost3"
+      })
+    },
+    walls: {
+      // Add walls around the edges and for decorations
+      // Left wall
+      [utils.asGridCoord(0,1)]: true,
+      [utils.asGridCoord(0,2)]: true,
+      [utils.asGridCoord(0,3)]: true,
+      [utils.asGridCoord(0,4)]: true,
+      [utils.asGridCoord(0,5)]: true,
+      [utils.asGridCoord(0,6)]: true,
+      [utils.asGridCoord(0,7)]: true,
+      [utils.asGridCoord(0,8)]: true,
+      [utils.asGridCoord(0,9)]: true,
+      [utils.asGridCoord(0,10)]: true,
+      
+      // Right wall
+      [utils.asGridCoord(14,1)]: true,
+      [utils.asGridCoord(14,2)]: true,
+      [utils.asGridCoord(14,3)]: true,
+      [utils.asGridCoord(14,4)]: true,
+      [utils.asGridCoord(14,5)]: true,
+      [utils.asGridCoord(14,6)]: true,
+      [utils.asGridCoord(14,7)]: true,
+      [utils.asGridCoord(14,8)]: true,
+      [utils.asGridCoord(14,9)]: true,
+      [utils.asGridCoord(14,10)]: true,
+      
+      // Top wall
+      [utils.asGridCoord(1,0)]: true,
+      [utils.asGridCoord(2,0)]: true,
+      [utils.asGridCoord(3,0)]: true,
+      [utils.asGridCoord(4,0)]: true,
+      [utils.asGridCoord(5,0)]: true,
+      [utils.asGridCoord(6,0)]: true,
+      [utils.asGridCoord(7,0)]: true,
+      [utils.asGridCoord(8,0)]: true,
+      [utils.asGridCoord(9,0)]: true,
+      [utils.asGridCoord(10,0)]: true,
+      [utils.asGridCoord(11,0)]: true,
+      [utils.asGridCoord(12,0)]: true,
+      [utils.asGridCoord(13,0)]: true,
+      
+      // Bottom wall
+      [utils.asGridCoord(1,12)]: true,
+      [utils.asGridCoord(2,12)]: true,
+      [utils.asGridCoord(3,12)]: true,
+      [utils.asGridCoord(4,12)]: true,
+      [utils.asGridCoord(6,12)]: true,
+      [utils.asGridCoord(7,12)]: true,
+      [utils.asGridCoord(8,12)]: true,
+      [utils.asGridCoord(9,12)]: true,
+      [utils.asGridCoord(10,12)]: true,
+      [utils.asGridCoord(11,12)]: true,
+      [utils.asGridCoord(12,12)]: true,
+      [utils.asGridCoord(13,12)]: true,
+      
+      // Reception desk
+      [utils.asGridCoord(5,4)]: true,
+      [utils.asGridCoord(6,4)]: true,
+      
+      // Add walls for the ghosts
+      [utils.asGridCoord(10,7)]: true,
+      [utils.asGridCoord(2,3)]: true,
+      [utils.asGridCoord(12,10)]: true,
+    },
+    cutsceneSpaces: {
+      // Exit to main hall (when all ghosts are identified)
+      [utils.asGridCoord(5,12)]: [
+        {
+          events: [
+            (map) => {
+              // Check if all ghosts have been identified
+              const remainingGhosts = window.guestBook.getRemainingGhostsCount();
+              if (remainingGhosts === 0) {
+                return [
+                  { type: "textMessage", text: "All ghosts have been identified! The hotel seems peaceful now." },
+                  { type: "textMessage", text: "You've successfully demonstrated how using a hash map can efficiently look up values by key!" },
+                  { type: "textMessage", text: "Congratulations on completing this chapter!" },
+                  { type: "changeMap", map: "DemoRoom" }
+                ];
+              } else {
+                return [
+                  { type: "textMessage", text: `There are still ${remainingGhosts} ghosts who need your help.` },
+                  { type: "textMessage", text: "Try to match each ghost with their name in the guest book." }
+                ];
+              }
+            }
+          ]
+        }
+      ],
+      
+      // Educational spot about hash maps
+      [utils.asGridCoord(3,8)]: [
+        {
+          events: [
+            { type: "textMessage", text: "Hash maps are data structures that store key-value pairs." },
+            { type: "textMessage", text: "In JavaScript, objects work like hash maps - you can look up values using keys." },
+            { type: "textMessage", text: "Our guest book works like a hash map: descriptions are keys, names are values." },
+            { type: "textMessage", text: "This allows us to quickly find names without checking each entry one by one." }
+          ]
+        }
+      ],
+      
+      // Educational spot about complexity
+      [utils.asGridCoord(10,3)]: [
+        {
+          events: [
+            { type: "textMessage", text: "Looking up values in a hash map is very efficient." },
+            { type: "textMessage", text: "It's an O(1) operation - meaning it takes the same time regardless of size." },
+            { type: "textMessage", text: "Think about how much faster it is to find a name using a detail..." },
+            { type: "textMessage", text: "...compared to checking each guest entry one by one (which would be O(n))." }
           ]
         }
       ]

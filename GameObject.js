@@ -8,6 +8,7 @@ class GameObject {
     this.sprite = new Sprite({
       gameObject: this,
       src: config.src || "/images/characters/people/hero.png",
+      animations: config.animations || null,
     });
 
     this.behaviorLoop = config.behaviorLoop || [];
@@ -28,7 +29,16 @@ class GameObject {
     }, 10)
   }
 
-  update() {
+  update(state) {
+    this.updateSprite(state);
+  }
+
+  updateSprite() {
+    if (this.movingProgressRemaining > 0) {
+      this.sprite.setAnimation("walk-"+this.direction);
+      return;
+    }
+    this.sprite.setAnimation("idle-"+this.direction);    
   }
 
   async doBehaviorEvent(map) { 
@@ -52,11 +62,10 @@ class GameObject {
     if (this.behaviorLoopIndex === this.behaviorLoop.length) {
       this.behaviorLoopIndex = 0;
     } 
-
     //Do it again!
-    this.doBehaviorEvent(map);
-    
-
+    if (!this.isStanding) {
+      this.doBehaviorEvent(map);
+    }
   }
 
 

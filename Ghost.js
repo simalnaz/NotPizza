@@ -1,4 +1,4 @@
-class Ghost extends GameObject {
+class Ghost extends Person {
   constructor(config) {
     super(config);
     this.movingProgressRemaining = 0;
@@ -19,25 +19,6 @@ class Ghost extends GameObject {
     }
   }
 
-  update(state) {
-    if (this.movingProgressRemaining > 0) {
-      this.updatePosition();
-    } else {
-      // Ghost-specific behavior - occasional floating movement
-      if (!state.map.isCutscenePlaying && Math.random() < 0.01) {
-        const directions = ["up", "down", "left", "right"];
-        const randomDirection = directions[Math.floor(Math.random() * directions.length)];
-        
-        this.startBehavior(state, {
-          type: "float",
-          direction: randomDirection
-        });
-      }
-      
-      this.updateSprite(state);
-    }
-  }
-
   startBehavior(state, behavior) {
     // Set character direction to whatever behavior has
     this.direction = behavior.direction;
@@ -50,7 +31,6 @@ class Ghost extends GameObject {
       
       // Ready to float!
       this.movingProgressRemaining = 16;
-      this.updateSprite(state);
     }
 
     if (behavior.type === "stand") {
@@ -75,14 +55,6 @@ class Ghost extends GameObject {
         whoId: this.id
       })
     }
-  }
-
-  updateSprite() {
-    if (this.movingProgressRemaining > 0) {
-      this.sprite.setAnimation("float-"+this.direction);
-      return;
-    }
-    this.sprite.setAnimation("idle-"+this.direction);    
   }
 
   // Memory-related methods

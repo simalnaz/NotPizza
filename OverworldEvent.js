@@ -73,6 +73,18 @@ class OverworldEvent {
     }
     resolve();
   }
+  nameGuess(resolve) {
+    const ghostId = this.event.ghostId;
+    
+    const nameGuessingMenu = new NameGuessingMenu({
+      ghostId: ghostId,
+      onComplete: () => {
+        resolve();
+      }
+    });
+    
+    nameGuessingMenu.init(document.querySelector(".game-container"));
+  }
 
   init() {
     return new Promise(resolve => {
