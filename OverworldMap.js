@@ -68,59 +68,69 @@ class OverworldMap {
     const hero = this.gameObjects["hero"];
     const nextCoords = utils.nextPosition(hero.x, hero.y, hero.direction);
     const match = Object.values(this.gameObjects).find(object => {
-      return `${object.x},${object.y}` === `${nextCoords.x},${nextCoords.y}`
+        return `${object.x},${object.y}` === `${nextCoords.x},${nextCoords.y}`
     });
-    
+
     // Check if the object is a key
     if (!this.isCutscenePlaying && match) {
-      if (match instanceof Key && !match.isCollected) {
-        const keyId = match.collect();
-        const wasAdded = utils.keyCollection.addKey(keyId);
-        
-        // Create a custom event for key collection
-        if (wasAdded) {
-          const foundText = `You found ${keyId}!`;
-          const keysRemaining = utils.keyCollection.totalKeys - utils.keyCollection.keysFound.length;
-          const remainingText = keysRemaining > 0 ? 
-            `${keysRemaining} more key${keysRemaining > 1 ? 's' : ''} to find.` : 
-            "You've found all the keys!";
-          
-          this.startCutscene([
-            { type: "textMessage", text: foundText },
-            { type: "textMessage", text: remainingText }
-          ]);
-          
-          // Make the key invisible or remove it from the map
-          delete this.gameObjects[keyId];
-          this.removeWall(match.x, match.y);
-          
-          // If all keys collected, update ghost dialogue
-          if (utils.keyCollection.hasAllKeys() && this.gameObjects["npcA"]) {
-            this.gameObjects["npcA"].talking = [{
-              events: [
-                { type: "textMessage", text: "You found all my keys!", faceHero: "npcA" },
-                { type: "textMessage", text: "Now I can finally pass on to the afterlife..." },
-                { type: "textMessage", text: "Thank you for your help!" },
-                { who: "npcA", type: "stand", direction: "up", time: 1000 },
-                { type: "textMessage", text: "Elliot's ghost fades away peacefully..." },
-                // Remove the ghost after the conversation
-                { 
-                  type: "removeObject", 
-                  objectId: "npcA"
+        if (match instanceof Key && !match.isCollected) {
+            const keyId = match.collect();
+            const wasAdded = utils.keyCollection.addKey(keyId);
+
+            // Create a custom event for key collection
+            if (wasAdded) {
+                const foundText = `You found ${keyId}!`;
+                const keysRemaining = utils.keyCollection.totalKeys - utils.keyCollection.keysFound.length;
+                const remainingText = keysRemaining > 0 ?
+                    `${keysRemaining} more key${keysRemaining > 1 ? 's' : ''} to find.` :
+                    "You've found all the keys!";
+
+                this.startCutscene([
+                    { type: "textMessage", text: foundText },
+                    { type: "textMessage", text: remainingText }
+                ]);
+
+                // Make the key invisible or remove it from the map
+                delete this.gameObjects[keyId];
+                this.removeWall(match.x, match.y);
+
+                // If all keys collected, update ghost dialogue
+                if (utils.keyCollection.hasAllKeys() && this.gameObjects["npcA"]) {
+                    this.gameObjects["npcA"].talking = [{
+                        events: [
+                            { type: "textMessage", text: "You found all my keys!", faceHero: "npcA" },
+                            { type: "textMessage", text: "Now I can finally pass on to the afterlife..." },
+                            { type: "textMessage", text: "Thank you for your help!" },
+                            { who: "npcA", type: "stand", direction: "up", time: 1000 },
+                            { type: "textMessage", text: "Elliot's ghost fades away peacefully..." },
+                            // Remove the ghost after the conversation
+                            {
+                                type: "removeObject",
+                                objectId: "npcA"
+                            }
+                        ]
+                    }];
                 }
-              ]
-            }];
-          }
-          return;
+                return;
+            }
         }
-      }
-      
-      // Normal NPC talking behavior
-      if (match.talking && match.talking.length) {
-        this.startCutscene(match.talking[0].events)
-      }
+
+        // Check if the object is a GhostName
+        if (match instanceof GhostName) {
+            if (match.hasBeenIdentified) {
+                return;
+            }
+            this.startCutscene(match.talking[0].events);
+            return;
+        }
+
+        // Normal NPC talking behavior
+        if (match.talking && match.talking.length) {
+            this.startCutscene(match.talking[0].events)
+        }
     }
-  }
+}
+
 
   checkForFootstepCutscene() {
     const hero = this.gameObjects["hero"];

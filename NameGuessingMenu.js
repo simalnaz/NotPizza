@@ -87,11 +87,11 @@ class NameGuessingMenu {
               <tbody>
         `;
         
-        // Add each entry
+        // Add each entry with data-name attribute to store the name
         Object.keys(activeEntries).forEach(name => {
           const entry = activeEntries[name];
           guestBookHTML += `
-            <tr class="GuestBook_entry">
+            <tr class="GuestBook_entry" data-name="${name}">
               <td>${name}</td>
               <td>${entry.room}</td>
               <td>${entry.description}</td>
@@ -124,7 +124,8 @@ class NameGuessingMenu {
             entry.style.backgroundColor = "#3e3e4a";
             
             setTimeout(() => {
-              const name = entry.querySelector("td").textContent;
+              // Get name from the data-name attribute
+              const name = entry.getAttribute("data-name");
               this.nameInput.value = name;
               this.toggleGuestBook();
             }, 200);
@@ -182,6 +183,7 @@ class NameGuessingMenu {
             e.preventDefault();
             if (this.selectedEntryIndex >= 0 && this.selectedEntryIndex < entries.length) {
               const selectedEntry = entries[this.selectedEntryIndex];
+              // Get name from data-name attribute
               const name = selectedEntry.getAttribute("data-name");
               this.nameInput.value = name;
               this.toggleGuestBook();

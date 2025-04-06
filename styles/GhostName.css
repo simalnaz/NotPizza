@@ -170,3 +170,169 @@
   .GuestBook_entry:hover {
     animation: subtle-glow 1.5s infinite;
   }
+
+  /* Name Guessing Menu Styles - Matching Puzzle Aesthetic */
+.menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(10, 10, 15, 0.85);
+    z-index: 10;
+    backdrop-filter: blur(3px);
+  }
+  
+  .NameGuessingMenu {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #1a1a22;
+    border: 2px solid #c9a959;
+    width: 85%;
+    max-width: 340px;
+    z-index: 15;
+    font-family: 'Courier New', monospace;
+    color: #d4c9a8;
+    box-shadow: 0 0 25px rgba(201, 169, 89, 0.25);
+    padding-bottom: 10px;
+  }
+  
+  .NameGuessingMenu::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='6' height='6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5 0h1L0 6V5zm1 5v1H5z' fill='%23c9a959' fill-opacity='.1'/%3E%3C/svg%3E");
+    opacity: 0.2;
+    pointer-events: none;
+  }
+  
+  .NameGuessingMenu_title {
+    background: #2a2a32;
+    color: #c9a959;
+    margin: 0;
+    padding: 10px 15px;
+    font-size: 16px;
+    font-weight: normal;
+    letter-spacing: 1px;
+    text-align: center;
+    text-transform: uppercase;
+    border-bottom: 1px solid #c9a959;
+  }
+  
+  .NameGuessingMenu_content {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .NameGuessingMenu_input {
+    background: rgba(26, 26, 34, 0.7);
+    border: 1px solid #c9a959;
+    color: #f0e6c8;
+    padding: 10px;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+    transition: all 0.3s;
+  }
+  
+  .NameGuessingMenu_input:focus {
+    outline: none;
+    border-color: #d6b962;
+    box-shadow: 0 0 8px rgba(201, 169, 89, 0.3);
+  }
+  
+  .NameGuessingMenu_buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: space-between;
+  }
+  
+  .NameGuessingMenu_button {
+    background-color: #2a2a32;
+    color: #c9a959;
+    border: 1px solid #c9a959;
+    padding: 8px 12px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    cursor: pointer;
+    flex: 1;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .NameGuessingMenu_button:hover {
+    background-color: #353542;
+    box-shadow: 0 0 8px rgba(201, 169, 89, 0.2);
+  }
+  
+  .NameGuessingMenu_button:active {
+    background-color: #c9a959;
+    color: #1a1a22;
+  }
+  
+  .NameGuessingMenu_button--guess {
+    background-color: rgba(201, 169, 89, 0.15);
+  }
+  
+  .NameGuessingMenu_button--cancel {
+    background-color: rgba(150, 40, 40, 0.1);
+  }
+  
+  .NameGuessingMenu_hint {
+    padding: 0 16px;
+    margin: 0;
+    font-size: 11px;
+    font-style: italic;
+    color: #a89e80;
+    text-align: center;
+    line-height: 1.4;
+  }
+  
+  .NameGuessingMenu_message {
+    margin: 0;
+    padding: 6px 8px;
+    font-size: 12px;
+    text-align: center;
+    border: 1px solid transparent;
+  }
+  
+  .NameGuessingMenu_message--success {
+    background-color: rgba(40, 120, 40, 0.2);
+    border-color: rgba(40, 120, 40, 0.4);
+    color: #98e698;
+  }
+  
+  .NameGuessingMenu_message--error {
+    background-color: rgba(150, 40, 40, 0.2);
+    border-color: rgba(150, 40, 40, 0.4);
+    color: #e69898;
+  }
+  
+  /* Keyboard navigation styles */
+  .GuestBook_entry.selected {
+    background-color: #3e3e4a;
+    border-left: 2px solid #c9a959;
+  }
+  
+  .GuestBook_entry.selected td {
+    color: #f0e6c8;
+  }
+  
+  /* Animation for message appearance */
+  @keyframes fade-in {
+    0% { opacity: 0; transform: translateY(-5px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  
+  .NameGuessingMenu_message {
+    animation: fade-in 0.3s ease-out;
+  }

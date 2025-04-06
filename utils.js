@@ -55,12 +55,9 @@ const utils = {
 
   // Add these functions to your existing utils object
   getGameObjectByIdFromAnyMap: function(id) {
-    // Check all maps for the object with the given ID
-    for (const mapKey in window.OverworldMaps) {
-      const map = window.OverworldMaps[mapKey];
-      if (map.gameObjects && map.gameObjects[id]) {
-        return map.gameObjects[id];
-      }
+    // Check only the current map for the object with the given ID
+    if (window.overworld && window.overworld.map && window.overworld.map.gameObjects && window.overworld.map.gameObjects[id]) {
+        return window.overworld.map.gameObjects[id];
     }
     return null;
   },
