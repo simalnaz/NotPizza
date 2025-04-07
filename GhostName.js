@@ -26,8 +26,8 @@ class GhostName extends Ghost {
         }
     
         this.updateTalking(); // Make sure dialogue updates after realName is set
-    }
-    
+    }    
+
     updateTalking() {
         // Base dialogue - changes based on ghost state
         if (this.hasBeenIdentified) {
@@ -84,4 +84,4 @@ class GhostName extends Ghost {
 
         }
     }    
-}
+} 

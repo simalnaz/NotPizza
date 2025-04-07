@@ -2,14 +2,14 @@ const utils = {
   withGrid(n) {
     return n * 16;
   },
-  asGridCoord(x,y) {
-    return `${x*16},${y*16}`
+  asGridCoord(x, y) {
+    return `${x * 16},${y * 16}`;
   },
   nextPosition(initialX, initialY, direction) {
     let x = initialX;
     let y = initialY;
     const size = 16;
-    if (direction === "left") { 
+    if (direction === "left") {
       x -= size;
     } else if (direction === "right") {
       x += size;
@@ -18,13 +18,13 @@ const utils = {
     } else if (direction === "down") {
       y += size;
     }
-    return {x,y};
+    return { x, y };
   },
   oppositeDirection(direction) {
-    if (direction === "left") { return "right" }
-    if (direction === "right") { return "left" }
-    if (direction === "up") { return "down" }
-    return "up"
+    if (direction === "left") { return "right"; }
+    if (direction === "right") { return "left"; }
+    if (direction === "up") { return "down"; }
+    return "up";
   },
 
   emitEvent(name, detail) {
@@ -33,7 +33,7 @@ const utils = {
     });
     document.dispatchEvent(event);
   },
-  
+
   // Key tracking functionality
   keyCollection: {
     keysFound: [],
@@ -53,12 +53,22 @@ const utils = {
     }
   },
 
-  // Add these functions to your existing utils object
+  // Get game object by ID from any map (updated from GhostName.js)
   getGameObjectByIdFromAnyMap: function(id) {
-    // Check only the current map for the object with the given ID
-    if (window.overworld && window.overworld.map && window.overworld.map.gameObjects && window.overworld.map.gameObjects[id]) {
-        return window.overworld.map.gameObjects[id];
+    for (const mapKey in window.OverworldMaps) {
+      const map = window.OverworldMaps[mapKey];
+      if (map.gameObjects && map.gameObjects[id]) {
+        return map.gameObjects[id];
+      }
     }
     return null;
   },
+
+  // Get game object by ID from the current map (from GhostName.js)
+  getGameObjectByIdFromCurrentMap: function(id) {
+    if (window.overworld && window.overworld.map && window.overworld.map.gameObjects && window.overworld.map.gameObjects[id]) {
+      return window.overworld.map.gameObjects[id];
+    }
+    return null;
+  }
 };

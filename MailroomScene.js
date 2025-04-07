@@ -291,5 +291,3 @@ class MailroomScene {
         });
     }
   }
-  
-  export default MailroomScene;
