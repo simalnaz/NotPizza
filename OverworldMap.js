@@ -217,6 +217,22 @@ window.OverworldMaps = {
           }
         ]
       }),
+      npcC: new Person({
+        x: utils.withGrid(11),
+        y: utils.withGrid(9),
+        src: "/images/characters/people/npc8.png",
+        behaviorLoop: [],
+        talking: [
+          {
+            events: [
+              { type: "textMessage", text: "My memories are all backwards... I can't move on like this.", faceHero: "npcC" },
+              { type: "custom", callback: () => {
+                  window.overworld.startReverseHaunting();
+              }}
+            ]
+          }
+        ]
+      }),      
     },
     walls: {
       [utils.asGridCoord(7,6)] : true,
@@ -241,6 +257,37 @@ window.OverworldMaps = {
           ]
         }
       ],
+      [utils.asGridCoord(5, 7)]: [
+        {
+          events: [
+            { type: "textMessage", text: "You found the first diary page..." },
+            { type: "custom", callback: () => {
+                window.overworld.readDiaryChain();
+            }}
+          ],
+          [utils.asGridCoord(5, 8)]: [
+            {
+              events: [
+                { type: "textMessage", text: "You found another diary page..." },
+                { type: "custom", callback: () => {
+                    window.overworld.readDiaryChain();
+                }}
+              ]
+            }
+          ],
+          [utils.asGridCoord(5, 9)]: [
+            {
+              events: [
+                { type: "textMessage", text: "This page seems to be the last..." },
+                { type: "custom", callback: () => {
+                    window.overworld.readDiaryChain();
+                }}
+              ]
+            }
+          ],
+          
+        }
+      ],      
       [utils.asGridCoord(5,10)]: [ // Transition point at (5, 10)
         {
           events: [

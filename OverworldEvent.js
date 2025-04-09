@@ -61,6 +61,11 @@ class OverworldEvent {
     this.map.overworld.startMap( window.OverworldMaps[this.event.map] );
     resolve();
   }
+  custom(resolve) {
+    this.event.callback();
+    resolve();
+  }
+  
 
   // Add a new event type for removing objects
   removeObject(resolve) {
@@ -89,6 +94,6 @@ class OverworldEvent {
   init() {
     return new Promise(resolve => {
       this[this.event.type](resolve)      
-    })
+    });
   }
 }

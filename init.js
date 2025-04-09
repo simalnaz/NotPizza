@@ -30,6 +30,8 @@
     element: document.querySelector(".game-container"),
   });
 
+  window.overworld = overworld;
+
   // Check if window.OverworldMaps is defined before accessing Street
   if (window.OverworldMaps && window.OverworldMaps.DemoRoom) {
     // Start the game with the DemoRoom map
