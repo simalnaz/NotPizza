@@ -34,10 +34,10 @@ const utils = {
     document.dispatchEvent(event);
   },
 
-  // Key tracking functionality
   keyCollection: {
     keysFound: [],
     totalKeys: 3,
+  
     addKey: function(keyId) {
       if (!this.keysFound.includes(keyId)) {
         this.keysFound.push(keyId);
@@ -45,13 +45,15 @@ const utils = {
       }
       return false;
     },
+    
     hasAllKeys: function() {
       return this.keysFound.length >= this.totalKeys;
     },
+  
     reset: function() {
       this.keysFound = [];
     }
-  },
+  },  
 
   // Get game object by ID from any map (updated from GhostName.js)
   getGameObjectByIdFromAnyMap: function(id) {

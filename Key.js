@@ -23,6 +23,6 @@ class Key extends GameObject {
   
     collect() {
       this.isCollected = true;
-      return this.id;
-    }
+      return this.id; // Make sure this is the descriptive name
+    }    
   }

@@ -41,7 +41,9 @@ class OverworldMap {
     Object.keys(this.gameObjects).forEach(key => {
 
       let object = this.gameObjects[key];
-      object.id = key;
+      object.mapId = key;        // ✅ use this for logic like teleports
+      object.id = object.id || key; // ✅ use this only if .id wasn't already defined
+
 
       //TODO: determine if this object should actually mount
       object.mount(this);
@@ -70,70 +72,77 @@ class OverworldMap {
     const hero = this.gameObjects["hero"];
     const nextCoords = utils.nextPosition(hero.x, hero.y, hero.direction);
     const match = Object.values(this.gameObjects).find(object => {
-        return `${object.x},${object.y}` === `${nextCoords.x},${nextCoords.y}`
+      return `${object.x},${object.y}` === `${nextCoords.x},${nextCoords.y}`
     });
-
-    // Check if the object is a key
-    if (!this.isCutscenePlaying && match) {
-        if (match instanceof Key && !match.isCollected) {
-            const keyId = match.collect();
-            const wasAdded = utils.keyCollection.addKey(keyId);
-
-            // Create a custom event for key collection
-            if (wasAdded) {
-                const foundText = `You found ${keyId}!`;
-                const keysRemaining = utils.keyCollection.totalKeys - utils.keyCollection.keysFound.length;
-                const remainingText = keysRemaining > 0 ?
-                    `${keysRemaining} more key${keysRemaining > 1 ? 's' : ''} to find.` :
-                    "You've found all the keys!";
-
-                this.startCutscene([
-                    { type: "textMessage", text: foundText },
-                    { type: "textMessage", text: remainingText }
-                ]);
-
-                // Make the key invisible or remove it from the map
-                delete this.gameObjects[keyId];
-                this.removeWall(match.x, match.y);
-
-                // If all keys collected, update ghost dialogue
-                if (utils.keyCollection.hasAllKeys() && this.gameObjects["npcA"]) {
-                    this.gameObjects["npcA"].talking = [{
-                        events: [
-                            { type: "textMessage", text: "You found all my keys!", faceHero: "npcA" },
-                            { type: "textMessage", text: "Now I can finally pass on to the afterlife..." },
-                            { type: "textMessage", text: "Thank you for your help!" },
-                            { who: "npcA", type: "stand", direction: "up", time: 1000 },
-                            { type: "textMessage", text: "Elliot's ghost fades away peacefully..." },
-                            // Remove the ghost after the conversation
-                            {
-                                type: "removeObject",
-                                objectId: "npcA"
-                            }
-                        ]
-                    }];
-                }
-                return;
-            }
-        }
-
-        // Check if the object is a GhostName
-        if (match instanceof GhostName) {
-            if (match.hasBeenIdentified) {
-                return;
-            }
-            this.startCutscene(match.talking[0].events);
-            return;
-        }
-
-        // Normal NPC talking behavior
-        if (match.talking && match.talking.length) {
-            this.startCutscene(match.talking[0].events)
-        }
+  
+    // Early return if no match found
+    if (!match) {
+      return;
     }
-}
-
-
+  
+    if (match instanceof Key && !match.isCollected) {
+      const keyId = match.collect(); // This correctly gets the key name like "Gold Safe Key"
+      const wasAdded = utils.keyCollection.addKey(keyId);
+    
+      if (wasAdded) {
+        const foundText = `You found the ${keyId}!`;
+        const keysRemaining = utils.keyCollection.totalKeys - utils.keyCollection.keysFound.length;
+        const remainingText = keysRemaining > 0
+          ? `${keysRemaining} more key${keysRemaining > 1 ? 's' : ''} to find.`
+          : "You've found all the keys!";
+    
+        this.startCutscene([
+          { type: "textMessage", text: foundText },
+          { type: "textMessage", text: remainingText }
+        ]);
+    
+        // Find the object key so we can delete it
+        const objectKey = Object.keys(this.gameObjects).find(k => this.gameObjects[k] === match);
+        if (objectKey) {
+          delete this.gameObjects[objectKey];
+        }
+        this.removeWall(match.x, match.y);
+    
+        if (utils.keyCollection.hasAllKeys()) {
+          window.elliotShouldFade = true;
+        }
+      }
+    
+      return;
+    }
+    
+    if (window.elliotShouldFade && this.gameObjects["npcA"]) {
+      window.elliotShouldFade = false;
+    
+      this.startCutscene([
+        { type: "textMessage", text: "You found all my keys!", faceHero: "npcA" },
+        { type: "textMessage", text: "Now I can finally pass on to the afterlife..." },
+        { type: "textMessage", text: "Thank you for your help!" },
+        { who: "npcA", type: "walk", direction: "up" },
+        { who: "npcA", type: "stand", direction: "up", time: 500 },
+        { type: "textMessage", text: "Elliot's ghost fades away peacefully..." },
+        { type: "removeObject", objectId: "npcA" },
+        { type: "textMessage", text: "You feel a warm breeze... the ghost has moved on." }
+      ]);
+    
+      return; // prevent other NPC logic from running
+    }    
+  
+    // Check if the object is a GhostName
+    if (match instanceof GhostName) {
+      if (match.hasBeenIdentified) {
+        return;
+      }
+      this.startCutscene(match.talking[0].events);
+      return;
+    }
+  
+    // Normal NPC talking behavior
+    if (match.talking && match.talking.length) {
+      this.startCutscene(match.talking[0].events);
+    }
+  }
+  
   checkForFootstepCutscene() {
     const hero = this.gameObjects["hero"];
     const match = this.cutsceneSpaces[ `${hero.x},${hero.y}` ];
@@ -153,7 +162,6 @@ class OverworldMap {
     const {x,y} = utils.nextPosition(wasX, wasY, direction);
     this.addWall(x,y);
   }
-
 }
 
 window.OverworldMaps = {
@@ -192,15 +200,15 @@ window.OverworldMaps = {
       key1: new Key({
         x: utils.withGrid(3),
         y: utils.withGrid(4),
-        src: "/images/characters/objects/key.png", // You'll need to create this image
-        id: "Master Key"
+        src: "/images/characters/objects/key.png", 
+        id: "Iron Master Key"
       }),
       key2: new Key({
         x: utils.withGrid(10), 
         y: utils.withGrid(2),
         src: "/images/characters/objects/key.png",
-        id: "Room Key"
-      }),
+        id: "Brass Room Key"
+      }),      
       // Keep the other NPC
       npcB: new Person({
         x: utils.withGrid(8),
@@ -256,37 +264,6 @@ window.OverworldMaps = {
             { who: "hero", type: "walk",  direction: "left" },
           ]
         }
-      ],
-      [utils.asGridCoord(5, 7)]: [
-        {
-          events: [
-            { type: "textMessage", text: "You found the first diary page..." },
-            { type: "custom", callback: () => {
-                window.overworld.readDiaryChain();
-            }}
-          ],
-          [utils.asGridCoord(5, 8)]: [
-            {
-              events: [
-                { type: "textMessage", text: "You found another diary page..." },
-                { type: "custom", callback: () => {
-                    window.overworld.readDiaryChain();
-                }}
-              ]
-            }
-          ],
-          [utils.asGridCoord(5, 9)]: [
-            {
-              events: [
-                { type: "textMessage", text: "This page seems to be the last..." },
-                { type: "custom", callback: () => {
-                    window.overworld.readDiaryChain();
-                }}
-              ]
-            }
-          ],
-          
-        }
       ],      
       [utils.asGridCoord(5,10)]: [ // Transition point at (5, 10)
         {
@@ -294,7 +271,7 @@ window.OverworldMaps = {
             { type: "changeMap", map: "Kitchen" }
           ]
         }
-      ]
+      ],
     }
   },
   Kitchen: {
@@ -326,8 +303,8 @@ window.OverworldMaps = {
         x: utils.withGrid(2),
         y: utils.withGrid(7),
         src: "/images/characters/objects/key.png",
-        id: "Safe Key"
-      }),
+        id: "Gold Safe Key"
+      }),      
     },
     walls: {
       // Add walls for the key
@@ -340,7 +317,14 @@ window.OverworldMaps = {
             { type: "changeMap", map: "Street" }
           ]
         }
-      ]
+      ],
+      [utils.asGridCoord(5,4)]: [
+        {
+          events: [
+            { type: "changeMap", map: "DemoRoom" }
+          ]
+        }
+      ]      
     }
   },
   // Add this new map to your OverworldMaps object
@@ -516,7 +500,14 @@ window.OverworldMaps = {
             { type: "textMessage", text: "...compared to checking each guest entry one by one (which would be O(n))." }
           ]
         }
-      ]
+      ],
+      [utils.asGridCoord(5,10)]: [
+        {
+          events: [
+            { type: "changeMap", map: "Kitchen" }
+          ]
+        }
+      ]      
     }
   },
 }

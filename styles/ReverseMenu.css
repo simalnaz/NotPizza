@@ -236,41 +236,8 @@
   .button-icon {
     font-size: 9px;
   }
-  
-  .ReverseMenu_hint {
-    text-align: center;
-    margin-top: 5px;
-  }
-  
-  .ReverseMenu_hint_button {
-    background: none;
-    border: none;
-    color: #aab;
-    font-size: 9px;
-    cursor: pointer;
-    text-decoration: underline;
-    transition: color 0.2s ease;
-    font-family: 'Georgia', serif;
-  }
-  
-  .ReverseMenu_hint_button:hover {
-    color: #e0e0ff;
-  }
-  
-  .ReverseMenu_hint_text {
-    margin-top: 3px;
-    padding: 4px;
-    background: rgba(40, 40, 60, 0.6);
-    border-radius: 3px;
-    font-size: 8px;
-    color: #ccd;
-    border: 1px dashed #556;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-  }
-  
-  .ReverseMenu_hint_text.hidden {
-    display: none;
-  }
+
+
   
   .ReverseMenu_results {
     background: rgba(40, 60, 40, 0.6);

@@ -1,0 +1,167 @@
+.InventoryMenu {
+    position: absolute;
+    left: 4px;
+    right: 4px;
+    top: 4px;
+    bottom: 4px;
+    background: var(--menu-background);
+    color: var(--menu-font-color);
+    border: 1px solid var(--menu-border-color);
+    z-index: 2;
+    padding: 8px;
+    border-radius: 4px;
+    user-select: none;
+    max-width: 320px;
+    margin: 0 auto;
+  }
+  
+  .InventoryMenu_title {
+    background: var(--menu-title-background);
+    color: var(--menu-title-color);
+    padding: 8px;
+    text-align: center;
+    margin-bottom: 8px;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: bold;
+  }
+  
+  .InventoryMenu_items-container {
+    display: flex;
+    height: calc(100% - 80px);
+    margin-bottom: 8px;
+  }
+  
+  .InventoryMenu_list {
+    width: 50%;
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    padding: 4px;
+    margin-right: 8px;
+  }
+  
+  .InventoryMenu_details {
+    width: 50%;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .InventoryMenu_item {
+    display: flex;
+    align-items: center;
+    padding: 6px;
+    margin-bottom: 2px;
+    border-radius: 4px;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.1);
+  }
+  
+  .InventoryMenu_item.selected {
+    background: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 0 2px var(--menu-selected-border);
+  }
+  
+  .InventoryMenu_icon {
+    width: 24px;
+    height: 24px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin-right: 8px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+  }
+  
+  .InventoryMenu_icon.icon-key {
+    background-image: url('/images/characters/objects/key.png');
+  }
+  
+  .InventoryMenu_icon.icon-default {
+    background-color: #666;
+  }
+  
+  .InventoryMenu_quantity {
+    margin-left: auto;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+  }
+  
+  .InventoryMenu_image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    margin-bottom: 8px;
+  }
+  
+  .InventoryMenu_image {
+    width: 64px;
+    height: 64px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+  
+  .InventoryMenu_description {
+    flex-grow: 1;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    font-size: 14px;
+    overflow-y: auto;
+  }
+  
+  .InventoryMenu_description h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+    font-size: 16px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding-bottom: 4px;
+  }
+  
+  .InventoryMenu_empty {
+    padding: 24px 0;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.5);
+    font-style: italic;
+  }
+  
+  .InventoryMenu_pagination {
+    text-align: center;
+    padding: 4px;
+    margin-bottom: 4px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+  }
+  
+  .InventoryMenu_instructions {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    padding: 8px;
+    text-align: center;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+  }
+  
+  .InventoryMenu_instructions p {
+    margin: 0;
+  }
+  
+  /* Define CSS variables - these should match your game's theme */
+  :root {
+    --menu-background: rgba(13, 20, 39, 0.9);
+    --menu-border-color: rgba(124, 163, 230, 0.6);
+    --menu-font-color: rgba(255, 255, 255, 0.9);
+    --menu-title-background: rgba(61, 85, 136, 0.8);
+    --menu-title-color: rgba(255, 255, 255, 1);
+    --menu-selected-border: rgba(255, 197, 61, 0.8);
+  }

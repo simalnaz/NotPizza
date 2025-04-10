@@ -8,7 +8,6 @@ class Ghost extends Person {
     this.isTransparent = config.isTransparent || false;
     this.memories = config.memories || [];
     this.discoveredMemories = [];
-    this.letterPuzzle = config.letterPuzzle || null;
     this.hasCompletedPuzzle = false;
     
     this.directionUpdate = {
@@ -74,21 +73,5 @@ class Ghost extends Person {
   
   hasDiscoveredAllMemories() {
     return this.memories.length === this.discoveredMemories.length;
-  }
-  
-  // Letter puzzle methods
-  startLetterPuzzle(container, onComplete) {
-    if (!this.letterPuzzle) return;
-    
-    const puzzleMenu = new PuzzleMenu({
-      sentences: this.letterPuzzle.sentences,
-      solution: this.letterPuzzle.solution,
-      onComplete: () => {
-        this.hasCompletedPuzzle = true;
-        onComplete();
-      }
-    });
-    
-    puzzleMenu.init(container);
   }
 }

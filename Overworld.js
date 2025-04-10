@@ -109,28 +109,6 @@ class Overworld {
    // ])
   
   }
-  // ✅ Add these OUTSIDE of init() but INSIDE the class
-  readDiaryChain() {
-    let currentPageId = "page1";
-    const events = [];
-  
-    while (currentPageId) {
-      const page = DiaryPages[currentPageId];
-      events.push({ type: "textMessage", text: page.text });
-      currentPageId = page.next;
-    }
-  
-    // After showing all pages, trigger Elara's farewell cutscene
-    events.push(
-      { type: "textMessage", text: "Elara: You followed my story... every last word." },
-      { type: "textMessage", text: "Elara: Thank you. I can rest now." },
-      { who: "npcA", type: "walk", direction: "up" },
-      { type: "removeObject", objectId: "npcA" } // optional fade-out
-    );
-  
-    this.map.startCutscene(events);
-  }  
-
   startReverseHaunting() {
     const story = {
       node1: { id: "node1", text: "She never came. I buried the locket beneath the old oak.", next: "node2" },
