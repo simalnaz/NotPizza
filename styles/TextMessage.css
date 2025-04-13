@@ -11,8 +11,15 @@
 }
 .TextMessage_p {
   margin: 0;
-  font-size: 12px;
+  font-size: 10px;
 }
+.TextMessage span {
+  opacity: 0;
+}
+.TextMessage span.revealed {
+  opacity: 1;
+}
+
 .TextMessage_button {
   margin: 0;
   font-size: 8px;  

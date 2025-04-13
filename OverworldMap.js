@@ -1,5 +1,3 @@
-
-
 class OverworldMap {
   constructor(config) {
     this.overworld = null;
@@ -234,9 +232,7 @@ window.OverworldMaps = {
           {
             events: [
               { type: "textMessage", text: "My memories are all backwards... I can't move on like this.", faceHero: "npcC" },
-              { type: "custom", callback: () => {
-                  window.overworld.startReverseHaunting();
-              }}
+              { type: "startReversePuzzle", who: "npcC" }
             ]
           }
         ]

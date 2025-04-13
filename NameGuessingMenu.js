@@ -160,15 +160,45 @@ class NameGuessingMenu {
     
     // Process the guess
     const result = ghost.checkNameGuess(guessedName);
-    
-    // Show result message
-    this.showMessage(result.message);
-    
-    // If successful, close after a delay
+
     if (result.success) {
+      // 1. Update ghost state on success
+      ghost.hasBeenIdentified = true;
+
+      // 2. Mark the ghost as disappeared in the Guest Book
+      //    (Make sure ghost.realName was set correctly during mount)
+      if (ghost.realName) {
+          window.guestBook.markAsDisappeared(ghost.realName);
+      }
+
+      // 3. Update the ghost's talking array for the next interaction
+      ghost.updateTalking();
+
+      // 4. Show success message
+      this.showMessage(result.message);
+
+      // 5. Close menu after a delay
       setTimeout(() => {
         this.close();
-      }, 2000);
+      }, 2000); // Keep the delay
+
+    } else {
+      // 1. Update ghost state on failure
+      ghost.guessAttempts += 1;
+
+      // 2. Update the ghost's talking array (this might switch it to the "max attempts" state)
+      ghost.updateTalking();
+
+      // 3. Show failure message
+      this.showMessage(result.message);
+
+      // Optional: Clear the input field after a wrong guess
+      this.nameInput.value = "";
+
+      // Optional: Check if max attempts reached and close the menu if desired
+       if (ghost.guessAttempts >= ghost.maxGuessAttempts) {
+         setTimeout(() => { this.close(); }, 2000);
+       }
     }
   }
   

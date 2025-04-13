@@ -62,11 +62,9 @@ class GameObject {
     if (this.behaviorLoopIndex === this.behaviorLoop.length) {
       this.behaviorLoopIndex = 0;
     } 
-    //Do it again!
-    if (!this.isStanding) {
+    if (!this.isStanding && !map.isCutscenePlaying) {
       this.doBehaviorEvent(map);
     }
-  }
-
-
+    
+}
 }

@@ -67,10 +67,10 @@ const utils = {
   },
 
   // Get game object by ID from the current map (from GhostName.js)
-  getGameObjectByIdFromCurrentMap: function(id) {
-    if (window.overworld && window.overworld.map && window.overworld.map.gameObjects && window.overworld.map.gameObjects[id]) {
-      return window.overworld.map.gameObjects[id];
-    }
-    return null;
-  }
+  //getGameObjectByIdFromCurrentMap: function(id) {
+    //if (window.overworld && window.overworld.map && window.overworld.map.gameObjects && window.overworld.map.gameObjects[id]) {
+      //return window.overworld.map.gameObjects[id];
+    //}
+    //return null;
+  //}
 };
