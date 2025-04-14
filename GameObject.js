@@ -42,6 +42,12 @@ class GameObject {
   }
 
   async doBehaviorEvent(map) { 
+    // Ensure this object still exists on the map before trying to run behavior
+    // Use mapId as it's guaranteed to be the key in gameObjects
+    if (!map.gameObjects[this.mapId]) {
+      // console.log(`Behavior loop aborted for removed object: ${this.mapId}`); // Optional log
+      return;
+    }
 
     //Don't do anything if there is a more important cutscene or I don't have config to do anything
     //anyway.

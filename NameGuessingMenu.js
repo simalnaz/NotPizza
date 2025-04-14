@@ -165,6 +165,16 @@ class NameGuessingMenu {
       // 1. Update ghost state on success
       ghost.hasBeenIdentified = true;
 
+      const activeGhosts = ["ghost1", "ghost2", "ghost3"];
+      const allIdentified = activeGhosts.every(id => {
+        const g = utils.getGameObjectByIdFromAnyMap(id);
+        return g?.hasBeenIdentified;
+      });
+      if (allIdentified) {
+        utils.gameProgress.chapter2Completed = true;
+      }
+
+
       // 2. Mark the ghost as disappeared in the Guest Book
       //    (Make sure ghost.realName was set correctly during mount)
       if (ghost.realName) {
@@ -184,7 +194,7 @@ class NameGuessingMenu {
 
     } else {
       // 1. Update ghost state on failure
-      ghost.guessAttempts += 1;
+      //ghost.guessAttempts += 1;
 
       // 2. Update the ghost's talking array (this might switch it to the "max attempts" state)
       ghost.updateTalking();

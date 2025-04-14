@@ -135,6 +135,7 @@ class OverworldEvent {
     const menu = new ReverseMenu({
       nodes: story,
       onComplete: () => {
+        utils.gameProgress.chapter3Completed = true;
         // Run the post-puzzle cutscene using this.map (available in OverworldEvent)
         this.map.startCutscene([
           { type: "textMessage", text: "Ghost: My story... it makes sense now." },

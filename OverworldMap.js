@@ -72,17 +72,28 @@ class OverworldMap {
     const match = Object.values(this.gameObjects).find(object => {
       return `${object.x},${object.y}` === `${nextCoords.x},${nextCoords.y}`
     });
-  
-    // Early return if no match found
-    if (!match) {
+
+    // Early return if no match found or cutscene already playing
+    if (!match || this.isCutscenePlaying) {
       return;
     }
-  
+
+    // --- Key Collection Logic ---
     if (match instanceof Key && !match.isCollected) {
       const keyId = match.collect(); // This correctly gets the key name like "Gold Safe Key"
       const wasAdded = utils.keyCollection.addKey(keyId);
     
       if (wasAdded) {
+        window.playerInventory.addItem({
+          id: keyId, // Use the descriptive name as the unique item ID
+          name: keyId, // Display name
+          description: `A ${keyId.split(' ')[0].toLowerCase()} key. Looks important.`, // Simple description
+          icon: match.sprite.image.src, // Use the key's image source as the icon
+          stackable: false, // Keys usually aren't stackable
+          quantity: 1
+        });
+        console.log(`[Inventory] Added "${keyId}" to inventory.`);
+        
         const foundText = `You found the ${keyId}!`;
         const keysRemaining = utils.keyCollection.totalKeys - utils.keyCollection.keysFound.length;
         const remainingText = keysRemaining > 0
@@ -103,12 +114,13 @@ class OverworldMap {
     
         if (utils.keyCollection.hasAllKeys()) {
           window.elliotShouldFade = true;
+          utils.gameProgress.chapter1Completed = true;
         }
       }
     
       return;
     }
-    
+
     if (window.elliotShouldFade && this.gameObjects["npcA"]) {
       window.elliotShouldFade = false;
     
@@ -124,28 +136,79 @@ class OverworldMap {
       ]);
     
       return; // prevent other NPC logic from running
-    }    
-  
-    // Check if the object is a GhostName
+    } 
+
+    // --- GhostName Interaction Logic ---
     if (match instanceof GhostName) {
+      match.updateTalking();
       if (match.hasBeenIdentified) {
-        return;
+         // Optional: Show message for identified ghost
+         // this.startCutscene([{ type: "textMessage", text: `${match.realName} seems at peace.` }]);
+         return; // Do nothing or show simple message
       }
-      this.startCutscene(match.talking[0].events);
-      return;
+      // If not identified, start the guessing process (uses static events from updateTalking)
+      if (match.talking && match.talking.length > 0) {
+           this.startCutscene(match.talking[0].events);
+      }
+      return; // Exit after handling GhostName
     }
-  
-    // Normal NPC talking behavior
-    if (match.talking && match.talking.length) {
-      this.startCutscene(match.talking[0].events);
+
+    // --- General NPC Interaction Logic (Handles npcB, npcC, potentially others) ---
+    if (match.talking && match.talking.length > 0) {
+      let eventsToRun = match.talking[0].events;
+
+      // Check if the events are defined by a function (like npcC)
+      if (typeof eventsToRun[0] === 'function') {
+
+        // Execute the function, passing 'this' (the map) and a config object with 'who'
+        eventsToRun = eventsToRun[0](this, { who: match.id || match.mapId }); // <-- CORRECT
+
+
+      }
+
+      // Ensure we have a valid array of events before starting the cutscene
+      if (Array.isArray(eventsToRun) && eventsToRun.length > 0) {
+        this.startCutscene(eventsToRun);
+      } else {
+         // Optional: Log if the function didn't return events or config was bad
+         // Check if the original config was a function but didn't return a valid array
+         if (typeof match.talking[0].events[0] === 'function') {
+             console.warn(`Function-based talking config for ${match.id || match.mapId} did not return a valid event array.`);
+         } else if (!Array.isArray(eventsToRun) || eventsToRun.length === 0) {
+             console.warn(`No valid events found for ${match.id || match.mapId} after processing talking config.`);
+         }
+      }
+      // No return needed here if it's the last interaction type checked
     }
   }
   
   checkForFootstepCutscene() {
     const hero = this.gameObjects["hero"];
-    const match = this.cutsceneSpaces[ `${hero.x},${hero.y}` ];
-    if (!this.isCutscenePlaying && match) {
-      this.startCutscene( match[0].events )
+    const coord = `${hero.x},${hero.y}`; // Store coordinate string
+    const match = this.cutsceneSpaces[coord];
+
+    // Check if not playing, match exists, and match has at least one cutscene config
+    if (!this.isCutscenePlaying && match && match.length > 0) {
+
+      let eventsToRun = match[0].events; // Get the potential events array or function array
+
+      // Check if the first element is a function (indicating conditional logic)
+      if (typeof eventsToRun[0] === 'function') {
+        // Execute the function, passing 'this' (the map instance)
+        eventsToRun = eventsToRun[0](this); // <-- CORRECT
+
+      }
+
+      // Ensure we actually got an array of events back before starting
+      // (The function might return null or an empty array in some cases)
+      if (Array.isArray(eventsToRun) && eventsToRun.length > 0) {
+           this.startCutscene(eventsToRun);
+      } else if (typeof eventsToRun[0] !== 'function') {
+           // If it wasn't a function initially, and it's not a valid array now, log a warning.
+           // This handles cases where the config might be malformed but wasn't a function.
+           console.warn(`Cutscene configuration at ${coord} is not a function and did not resolve to a valid event array.`);
+      }
+      // If it was a function but returned an empty array or null, we just don't start a cutscene, which is fine.
     }
   }
 
@@ -228,15 +291,36 @@ window.OverworldMaps = {
         y: utils.withGrid(9),
         src: "/images/characters/people/npc8.png",
         behaviorLoop: [],
+
         talking: [
           {
             events: [
-              { type: "textMessage", text: "My memories are all backwards... I can't move on like this.", faceHero: "npcC" },
-              { type: "startReversePuzzle", who: "npcC" }
+              (map, eventConfig) => { // Use a function here too
+                const npcId = eventConfig.who; // Get the NPC ID if needed later
+                if (utils.gameProgress.chapter2Completed) {
+                  // Chapter 2 is done, allow puzzle start
+                  return [
+                    { type: "textMessage", text: "My memories are all backwards... I can't move on like this.", faceHero: npcId },
+                    { type: "startReversePuzzle", who: npcId }
+                  ];
+                } else if (utils.gameProgress.chapter1Completed) {
+                   // Chapter 1 done, but not 2
+                   return [
+                     { type: "textMessage", text: "I sense other spirits still need your help before I can ask for mine.", faceHero: npcId },
+                     { type: "textMessage", text: "(Perhaps those ghosts who lost their names?)" }
+                   ];
+                } else {
+                  // Neither Chapter 1 nor 2 is done
+                  return [
+                    { type: "textMessage", text: "...", faceHero: npcId }, // Ghost might be less coherent initially
+                    { type: "textMessage", text: "(This spirit seems deeply troubled, but perhaps not ready to talk yet.)" }
+                  ];
+                }
+              }
             ]
           }
         ]
-      }),      
+      }),
     },
     walls: {
       [utils.asGridCoord(7,6)] : true,
@@ -307,10 +391,31 @@ window.OverworldMaps = {
       [utils.asGridCoord(2,7)] : true,
     },
     cutsceneSpaces: {
-      [utils.asGridCoord(5,10)]: [ // Transition point at (5, 10)
+      [utils.asGridCoord(5,10)]: [ // Transition point TO Street
         {
+          // OLD: Direct map change
+          // events: [
+          //   { type: "changeMap", map: "Street" }
+          // ]
+
+          // NEW: Conditional map change
           events: [
-            { type: "changeMap", map: "Street" }
+            (map) => { // Use a function to add logic
+              if (utils.gameProgress.chapter1Completed) {
+                // Chapter 1 is done, allow entry to Street
+                return [
+                  { type: "changeMap", map: "Street" }
+                ];
+              } else {
+                // Chapter 1 is NOT done, block entry
+                return [
+                  { type: "textMessage", text: "The way forward seems blocked by lingering spectral energy..." },
+                  { type: "textMessage", text: "(Maybe I should finish helping Elliot first?)" }
+                  // Optional: Move the hero back one step
+                  // { who: "hero", type: "walk", direction: "up" }, // Assuming down was the direction to trigger
+                ];
+              }
+            }
           ]
         }
       ],

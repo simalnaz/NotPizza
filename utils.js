@@ -65,7 +65,6 @@ const utils = {
     }
     return null;
   },
-
   // Get game object by ID from the current map (from GhostName.js)
   //getGameObjectByIdFromCurrentMap: function(id) {
     //if (window.overworld && window.overworld.map && window.overworld.map.gameObjects && window.overworld.map.gameObjects[id]) {
@@ -73,4 +72,9 @@ const utils = {
     //}
     //return null;
   //}
+  gameProgress: {
+    chapter1Completed: false,
+    chapter2Completed: false,
+    chapter3Completed: false,
+  }
 };
