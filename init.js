@@ -30,16 +30,28 @@
     element: document.querySelector(".game-container"),
   });
 
-  window.overworld = overworld;
+  window.overworld = overworld; // Make it global
 
-  // Check if window.OverworldMaps is defined before accessing Street
-  if (window.OverworldMaps && window.OverworldMaps.DemoRoom) {
-    // Start the game with the DemoRoom map
-    overworld.startMap(window.OverworldMaps.DemoRoom);
+  // Check if window.OverworldMaps and Lobby exist
+  if (window.OverworldMaps && window.OverworldMaps.Lobby) {
+    // Initialize the Overworld (which now handles starting the map internally and waits)
+    overworld.init(); // This is now async, but we don't necessarily need to await it here
+                      // unless something else depends on init() completing.
   } else {
-    console.error("Error: window.OverworldMaps.DemoRoom is not defined.");
+    console.error("Error: window.OverworldMaps.Lobby is not defined. Cannot start game.");
+    // Display an error message to the user on the page
+    document.querySelector(".game-container").innerHTML =
+      '<p style="color: red; padding: 20px;">Error: Failed to load map configuration. Check console.</p>';
   }
 
-  // Initialize the Overworld
-  overworld.init();
+  // REMOVED the redundant overworld.startMap call here
+
+  // Initialize NotebookMenu (This is fine here)
+  const notebookMenu = new NotebookMenu();
+  notebookMenu.init(document.querySelector(".game-container"));
+
+  document.getElementById("notebook-icon").addEventListener("click", () => {
+    notebookMenu.toggle();
+  });
+
 })();

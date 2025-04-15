@@ -7,6 +7,13 @@ class Overworld {
   }
  
    startGameLoop() {
+        // Make sure map is loaded before starting the loop
+        if (!this.map || !this.map.isLoaded) {
+          console.warn("Attempted to start game loop before map was loaded.");
+          // Optionally, wait a bit and retry, or rely on init() structure
+          return;
+       }
+
      const step = () => {
        //Clear off the canvas
        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -62,22 +69,24 @@ class Overworld {
     })
   }
  
-  startMap(mapConfig) {
-   this.map = new OverworldMap(mapConfig);
-   this.map.overworld = this;
-   this.map.mountObjects();
+  async startMap(mapConfig) {
+    this.map = new OverworldMap(mapConfig);
+    this.map.overworld = this;
+    this.map.mountObjects();
+  
+    await this.map.waitForLoad(); // ✔️ RESİMLER YÜKLENSİN
   }
+  
  
-  init() {
-   this.startMap(window.OverworldMaps.DemoRoom);
- 
- 
-   this.bindActionInput();
-   this.bindHeroPositionCheck();
- 
-   this.directionInput = new DirectionInput();
-   this.directionInput.init();
- 
-   this.startGameLoop();
-  }
- }
+  async init() {
+    await this.startMap(window.OverworldMaps.Lobby); // ✔️ Harita yüklenmeden devam etme
+  
+    this.bindActionInput();
+    this.bindHeroPositionCheck();
+  
+    this.directionInput = new DirectionInput();
+    this.directionInput.init();
+  
+    this.startGameLoop(); // Artık doğru şekilde başlar
+  }  
+}

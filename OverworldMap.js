@@ -12,23 +12,85 @@ class OverworldMap {
     this.upperImage.src = config.upperSrc;
 
     this.isCutscenePlaying = false;
+
+    this.isLoaded = false;
+  }
+
+  // NEW: Method that returns a Promise which resolves when images are loaded
+  waitForLoad() {
+    return new Promise(resolve => {
+      // Check if already loaded (e.g., if switching maps)
+      if (this.lowerImage.complete && this.upperImage.complete) {
+         this.isLoaded = true;
+         resolve();
+         return;
+      }
+
+      let lowerLoaded = false;
+      let upperLoaded = false;
+
+      const checkBothLoaded = () => {
+        if (lowerLoaded && upperLoaded) {
+          this.isLoaded = true;
+          console.log(`Map images loaded for: ${this.lowerImage.src}`); // Debug log
+          resolve();
+        }
+      };
+
+      this.lowerImage.onload = () => {
+        lowerLoaded = true;
+        checkBothLoaded();
+      };
+      this.lowerImage.onerror = () => {
+         console.error(`Failed to load lower image: ${this.lowerImage.src}`);
+         lowerLoaded = true; // Still count as "done" loading, even if failed
+         checkBothLoaded();
+      }
+
+      this.upperImage.onload = () => {
+        upperLoaded = true;
+        checkBothLoaded();
+      };
+       this.upperImage.onerror = () => {
+         console.error(`Failed to load upper image: ${this.upperImage.src}`);
+         upperLoaded = true; // Still count as "done" loading, even if failed
+         checkBothLoaded();
+      }
+
+      // Handle cases where images might already be cached/complete before onload attaches
+      if (this.lowerImage.complete) {
+         lowerLoaded = true;
+         checkBothLoaded();
+      }
+      if (this.upperImage.complete) {
+         upperLoaded = true;
+         checkBothLoaded();
+      }
+
+    });
   }
 
   drawLowerImage(ctx, cameraPerson) {
     ctx.drawImage(
-      this.lowerImage, 
-      utils.withGrid(10.5) - cameraPerson.x, 
+      this.lowerImage,
+      utils.withGrid(10.5) - cameraPerson.x,
       utils.withGrid(6) - cameraPerson.y
-      )
+    );
   }
-
+  
   drawUpperImage(ctx, cameraPerson) {
-    ctx.drawImage(
-      this.upperImage, 
-      utils.withGrid(10.5) - cameraPerson.x, 
-      utils.withGrid(6) - cameraPerson.y
-    )
-  } 
+    // Only draw if the image is actually loaded
+    if (this.isLoaded) { // Or check this.upperImage.complete
+      ctx.drawImage(
+        this.upperImage,
+        utils.withGrid(10.5) - cameraPerson.x,
+        utils.withGrid(6) - cameraPerson.y
+      );
+    } else {
+       // Optional: Draw a placeholder or log if trying to draw unloaded upper image
+       // console.warn("Attempted to draw unloaded upper map image.");
+    }
+  }
 
   isSpaceTaken(currentX, currentY, direction) {
     const {x,y} = utils.nextPosition(currentX, currentY, direction);
@@ -226,14 +288,14 @@ class OverworldMap {
 }
 
 window.OverworldMaps = {
-  DemoRoom: {
-    lowerSrc: "/images/maps/DemoLower.png",
-    upperSrc: "/images/maps/DemoUpper.png",
+  Lobby: {
+    lowerSrc: "/images/maps/LobbyLower.png",
+    upperSrc: "/images/maps/LobbyUpper.png",
     gameObjects: {
       hero: new Person({
         isPlayerControlled: true,
-        x: utils.withGrid(5),
-        y: utils.withGrid(6),
+        x: utils.withGrid(24),
+        y: utils.withGrid(40),
       }),
       npcA: new Person({
         x: utils.withGrid(7),
@@ -422,7 +484,7 @@ window.OverworldMaps = {
       [utils.asGridCoord(5,4)]: [
         {
           events: [
-            { type: "changeMap", map: "DemoRoom" }
+            { type: "changeMap", map: "Lobby" }
           ]
         }
       ]      
@@ -438,7 +500,7 @@ window.OverworldMaps = {
         isPlayerControlled: true,
         x: utils.withGrid(5),
         y: utils.withGrid(8),
-        src: "/images/characters/people/hero.png" // Create this asset
+        src: "/images/characters/people/hero2.png" // Create this asset
       }),
       
       // The hotel receptionist NPC to explain the mechanics
@@ -566,7 +628,7 @@ window.OverworldMaps = {
                   { type: "textMessage", text: "All ghosts have been identified! The hotel seems peaceful now." },
                   { type: "textMessage", text: "You've successfully demonstrated how using a hash map can efficiently look up values by key!" },
                   { type: "textMessage", text: "Congratulations on completing this chapter!" },
-                  { type: "changeMap", map: "DemoRoom" }
+                  { type: "changeMap", map: "Lobby" }
                 ];
               } else {
                 return [
