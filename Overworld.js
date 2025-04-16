@@ -74,20 +74,48 @@ class Overworld {
     })
   }
  
-  async startMap(mapConfig) {
+  async startMap(mapConfig, sourceMapId = null) {
+    if (!mapConfig) {
+      console.error(`startMap called with invalid mapConfig (maybe map name "${this.event?.map}" doesn't exist in window.OverworldMaps?)`);
+      // Potentially stop the process or load a default map
+      return;
+  }
     this.map = new OverworldMap(mapConfig);
     this.map.overworld = this;
+    if (sourceMapId && this.map.config.entryPoints && this.map.config.entryPoints[sourceMapId]) {
+      const entryCoordsString = this.map.config.entryPoints[sourceMapId];
+      try {
+        const [x, y] = entryCoordsString.split(",").map(Number); // Parse "x,y" string
+
+        // Find the hero object and update its position
+        const hero = this.map.gameObjects.hero;
+        if (hero) {
+          hero.x = x;
+          hero.y = y;
+          console.log(`[Overworld] Using entry point from ${sourceMapId}: placing hero at ${x},${y} in ${mapConfig.id}`);
+        } else {
+          console.warn(`[Overworld] Map ${mapConfig.id} has entry point but no hero object defined!`);
+        }
+      } catch (e) {
+         console.error(`[Overworld] Error parsing entry point coordinates "${entryCoordsString}" for source ${sourceMapId} in map ${mapConfig.id}`, e);
+         // Fallback to default hero position might happen implicitly
+      }
+
+    } else {
+       // Optional: Log if no specific entry point was used
+       if (sourceMapId) {
+         console.log(`[Overworld] No specific entry point found for source ${sourceMapId} in map ${mapConfig.id}. Using default hero position.`);
+       } else {
+         // console.log(`[Overworld] No source map ID provided. Using default hero position for map ${mapConfig.id}.`);
+       }
+    }
     this.map.mountObjects();
   
     await this.map.waitForLoad(); // ✔️ RESİMLER YÜKLENSİN
   }
   
-  /**
-   * Display semi-transparent text in the center of the screen
-   * @param {string} text - The text to display
-   * @param {number} duration - How long to show the text in milliseconds
-   * @param {Function} callback - Optional callback function after text disappears
-   */
+
+
   showCenterText(text, duration = 3000, callback = null) {
     // Create the elements
     const container = document.createElement("div");

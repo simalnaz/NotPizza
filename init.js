@@ -22,6 +22,35 @@
       rememberedDetail: "plays the violin at midnight",
       id: "ghost3",
     }),
+    // Add new ghosts
+    new GhostName({
+      x: utils.withGrid(5),
+      y: utils.withGrid(5),
+      src: "/images/characters/people/npc1.png", // Adjust image path as needed
+      rememberedDetail: "wears a navy blue suit",
+      id: "ghost4",
+    }),
+    new GhostName({
+      x: utils.withGrid(8),
+      y: utils.withGrid(9),
+      src: "/images/characters/people/npc3.png", // Adjust image path as needed
+      rememberedDetail: "has a pearl necklace",
+      id: "ghost5",
+    }),
+    new GhostName({
+      x: utils.withGrid(15),
+      y: utils.withGrid(6),
+      src: "/images/characters/people/npc5.png", // Adjust image path as needed
+      rememberedDetail: "smokes a wooden pipe",
+      id: "ghost6",
+    }),
+    new GhostName({
+      x: utils.withGrid(4),
+      y: utils.withGrid(12),
+      src: "/images/characters/people/npc6.png", // Adjust image path as needed
+      rememberedDetail: "carries a red umbrella",
+      id: "ghost7",
+    }),
   ];
 
   // Initialize the Overworld
@@ -31,6 +60,7 @@
 
   window.overworld = overworld; // Make it global
   overworld.init().catch(console.error);
+  //Cheat for debugging
   document.addEventListener("keydown", (e) => {
     if (e.key === "L") {
       overworld.startMap(window.OverworldMaps.Lobby);
@@ -41,10 +71,16 @@
       utils.keyCollection.keysFound = ["Iron Master Key", "Silver Room Key", "Gold Safe Key"];
       alert("Chapter 1 complete cheat activated");
     }
+    if (e.key === "i") {
+      overworld.startMap(window.OverworldMaps.Hallway);
+    }
+    // Add a debug key for testing ghost identification
+    if (e.key === "G") {
+      utils.identifyGhost("Elliot");
+      alert("Identified Elliot!");
+    }
   });
   
-
-
   // Initialize NotebookMenu (This is fine here)
   const notebookMenu = new NotebookMenu();
   notebookMenu.init(document.querySelector(".game-container"));
@@ -111,10 +147,9 @@ document.addEventListener("DOMContentLoaded", function() {
           }
         })
         .catch(err => {
-            // Error during cutscene occurred (logging removed)
         });
-      } // End if (window.overworld && window.overworld.map)
-    } // End handleLetterClick
+      } 
+    } 
 
   // Add click event to the letter icon
   if (letterIcon) {

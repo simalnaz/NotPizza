@@ -112,47 +112,58 @@ class NotebookMenu {
     `;
   }
 
-  renderGhostsTab() {
-    const active = window.guestBook.getAllActiveEntries();
-    const all = Object.keys(window.guestBook.entries);
-    const identified = all.filter(name => !active[name]);
-    const unidentified = all.filter(name => active[name]);
+// Replace the renderGhostsTab method in NotebookMenu.js with this enhanced version
+renderGhostsTab() {
+  const active = window.guestBook.getAllActiveEntries();
+  const all = Object.keys(window.guestBook.entries);
+  const identified = all.filter(name => !active[name]);
+  const unidentified = all.filter(name => active[name]);
 
-    this.content.innerHTML = `
-      <div class="NotebookMenu_ghosts">
-        <h3>Ghost Collection</h3>
-        <p class="ghost-stats">You've identified ${identified.length} out of ${all.length} ghosts</p>
-        
-        <div class="ghost-collection">
-          <div class="ghost-section">
-            <h4>Identified Ghosts</h4>
-            <div class="ghost-grid identified">
-              ${identified.map(name => `
+  this.content.innerHTML = `
+    <div class="NotebookMenu_ghosts">
+      <h3>Ghost Collection</h3>
+      <p class="ghost-stats">You've identified ${identified.length} out of ${all.length} ghosts</p>
+      
+      <div class="ghost-collection">
+        <div class="ghost-section">
+          <h4>Identified Ghosts</h4>
+          <div class="ghost-grid identified">
+            ${identified.map(name => {
+              const ghost = window.guestBook.entries[name];
+              return `
                 <div class="ghost-card">
                   <div class="ghost-name">${name}</div>
-                  <div class="ghost-detail">${this.getGhostDetail(name)}</div>
+                  <div class="ghost-detail">${ghost.description}</div>
+                  <div class="ghost-year">Last seen: ${ghost.yearVisited}</div>
+                  <div class="ghost-room">Room: ${ghost.room}</div>
                 </div>
-              `).join("")}
-              ${identified.length === 0 ? '<p class="empty-message">No ghosts identified yet</p>' : ''}
-            </div>
+              `;
+            }).join("")}
+            ${identified.length === 0 ? '<p class="empty-message">No ghosts identified yet</p>' : ''}
           </div>
-          
-          <div class="ghost-section">
-            <h4>Unidentified Ghosts</h4>
-            <div class="ghost-grid unidentified">
-              ${unidentified.map(name => `
+        </div>
+        
+        <div class="ghost-section">
+          <h4>Unidentified Ghosts</h4>
+          <div class="ghost-grid unidentified">
+            ${unidentified.map(name => {
+              const ghost = window.guestBook.entries[name];
+              return `
                 <div class="ghost-card">
                   <div class="ghost-name">???</div>
-                  <div class="ghost-detail">${this.getGhostDetail(name)}</div>
+                  <div class="ghost-detail">${ghost.description}</div>
+                  <div class="ghost-year">Last seen: ???</div>
+                  <div class="ghost-room">Room: ???</div>
                 </div>
-              `).join("")}
-              ${unidentified.length === 0 ? '<p class="empty-message">All ghosts identified!</p>' : ''}
-            </div>
+              `;
+            }).join("")}
+            ${unidentified.length === 0 ? '<p class="empty-message">All ghosts identified!</p>' : ''}
           </div>
         </div>
       </div>
-    `;
-  }
+    </div>
+  `;
+}
 
   renderChaptersTab() {
     this.content.innerHTML = `

@@ -18,7 +18,6 @@ class OverworldMap {
     this.isLoaded = false;
   }
 
-  // --- ADD THE NEW METHOD HERE (or after waitForLoad) ---
   loadCollisionMask() {
     // Return a promise for consistency with waitForLoad
     return new Promise(resolve => {
@@ -51,6 +50,14 @@ class OverworldMap {
           // Check if this is the Lobby map based on its collision mask source
           // Make sure this path exactly matches the one in window.OverworldMaps.Lobby
           if (this.config.collisionMaskSrc === "/images/maps/LobbyLowerCollisionMask.png") {
+            console.log("Applying Lobby-specific DOWNWARD collision offset.");
+            // Apply ONLY the downward offset for the Lobby map
+            // collisionOffsetX remains 0
+            collisionOffsetX = 3;
+            collisionOffsetY = -10; // Shift collision 1 grid unit (16px) DOWN
+          }
+
+          if (this.config.collisionMaskSrc === "/images/maps/Lobby2CollisionMask.png") {
             console.log("Applying Lobby-specific DOWNWARD collision offset.");
             // Apply ONLY the downward offset for the Lobby map
             // collisionOffsetX remains 0
@@ -194,13 +201,13 @@ class OverworldMap {
       await eventHandler.init();
     }
 
-    if (event.type === "centerText") {
-      const centerText = new CenterTextDisplay({
-        text: event.text,
-        duration: event.duration || 3000
-      });
-      centerText.init(resolve);
-    }
+    //if (event.type === "centerText") {
+      //const centerText = new CenterTextDisplay({
+        //text: event.text,
+        //duration: event.duration || 3000
+      //});
+      //centerText.init(resolve);
+    //}
 
     this.isCutscenePlaying = false;
 
@@ -257,6 +264,7 @@ class OverworldMap {
         if (utils.keyCollection.hasAllKeys()) {
           window.elliotShouldFade = true;
           utils.gameProgress.chapter1Completed = true;
+          console.log("Chapter 1 Completed flag SET to true!", utils.gameProgress.chapter1Completed);
         }
       }
     
@@ -371,6 +379,7 @@ class OverworldMap {
 window.OverworldMaps = {
 
   Garden: {
+    id: "Garden",
     lowerSrc: "/images/maps/HotelGardenLower.png",
     upperSrc: "/images/maps/HotelGardenUpper.png",
     collisionMaskSrc:"/images/maps/HotelGardenCollisionMask.png",
@@ -381,6 +390,11 @@ window.OverworldMaps = {
         y: utils.withGrid(56),
   }),
 },
+    // Define where player lands IN Garden coming FROM other maps
+    entryPoints: {
+      "Lobby": utils.asGridCoord(26, 24), // Coming FROM Lobby, land here
+      // Add other maps if needed, e.g., "SecretPassage": utils.asGridCoord(x, y)
+    },
   cutsceneSpaces: {
     [utils.asGridCoord(26,24)]: [ 
       { 
@@ -413,18 +427,19 @@ window.OverworldMaps = {
 },
 
   Lobby: {
-    lowerSrc: "/images/maps/LobbyLower.png",
-    upperSrc: "/images/maps/LobbyUpper.png",
-    collisionMaskSrc: "/images/maps/LobbyLowerCollisionMask.png",
+    id: "Lobby",
+    lowerSrc: "/images/maps/LobbyLower2.png",
+    upperSrc: "/images/maps/LobbyUpper2.png",
+    collisionMaskSrc: "/images/maps/Lobby2CollisionMask.png",
     gameObjects: {
       hero: new Person({
         isPlayerControlled: true,
-        x: utils.withGrid(28),
-        y: utils.withGrid(56),
+        x: utils.withGrid(26),
+        y: utils.withGrid(58),
       }),
       Elliot: new Person({
-        x: utils.withGrid(28),
-        y: utils.withGrid(46),
+        x: utils.withGrid(26),
+        y: utils.withGrid(42),
         src: "/images/characters/people/elliot.png",
         //behaviorLoop: [
           //{ type: "stand",  direction: "left", time: 800 },
@@ -434,49 +449,59 @@ window.OverworldMaps = {
         //],
         talking: [
           {
+            // Use a function as the first (and only) event in the array
             events: [
-              { type: "textMessage", text: "<g>You... you can see me? Really see me?", faceHero: "Elliot<g>"},
-              { type: "textMessage", text: "<i>His voice echoes like it's traveling through water.<i>" },
-              { type: "textMessage", text: "I can. Are you the one who sent the letter?" },
-              { type: "textMessage", text: "<g>No... but I've been waiting. So long. The keys... I need my keys. Three of them. I was the keeper of all doors, but now I'm... locked out.<g>", faceHero: "Elliot"},
-              { type: "textMessage", text: "What happens if I find them for you?" },
-              { type: "textMessage", text: "<g>I can finish my final rounds. Check on the other guests. Move on. They scattered when it happened. Brass keys. My responsibility.<g>", faceHero: "Elliot"},
-              { type: "textMessage", text: "<i>His eyes hold a hunger I recognise. The desperate need for completion. For an end.<i>" },
-              { type: "textMessage", text: "I'll find them. What's your name?" },
-              { type: "textMessage", text: "<g>Elliot. I was the concierge. I am the concierge. The keys are still in the hotel. They must be. Please.<g>", faceHero: "Elliot" }
-            ]      
+              (map, eventConfig) => { // The function receives the map and event config
+                const npcId = eventConfig.who; // Get the ID ("Elliot")
+                
+                return [ // Start of the array returned by the IF block
+                    // --- Initial Dialogue ---
+                    { type: "textMessage", text: "<g>You... you can see me? Really see me?</g>", faceHero: npcId},
+                    { type: "textMessage", text: "<i>His voice echoes like it's traveling through water.<i>" },
+                    { type: "textMessage", text: "I can. Are you the one who sent the letter?" },
+                    { type: "textMessage", text: "<g>No... but I've been waiting. So long. The keys... I need my keys. Three of them. I was the keeper of all doors, but now I'm... locked out.</g>", faceHero: npcId},
+                    { type: "textMessage", text: "What happens if I find them for you?" },
+                    { type: "textMessage", text: "<g>I can finish my final rounds. Check on the other guests. Move on. They scattered when it happened. Brass keys. My responsibility.</g>", faceHero: npcId},
+                    { type: "textMessage", text: "<i>His eyes hold a hunger I recognise. The desperate need for completion. For an end.<i>" },
+                    { type: "textMessage", text: "I'll find them. What's your name?" },
+                    { type: "textMessage", text: "<g>Elliot. I was the concierge. I am the concierge. The keys are still in the hotel. They must be. Please.</g>", faceHero: npcId },
+                    {
+                      type: "callback",
+                      callback: () => {
+                        // Identify Elliot immediately after the conversation
+                        utils.identifyGhost("Elliot");
+                      }
+                    },
+                    {
+                      type: "callback",
+                      callback: () => {
+                        if (window.overworld && typeof window.overworld.showCenterText === 'function') {
+                          window.overworld.showCenterText("Chapter 1: Key Quest", 4000);
+                        } 
+                      }
+                    }
+                  ]
+                },
+              ]
           }
-        ]
+        ],
       }),
+
       // Hidden keys around the map
       key1: new Key({
-        x: utils.withGrid(48),
-        y: utils.withGrid(33),
+        x: utils.withGrid(40),
+        y: utils.withGrid(41),
         src: "/images/characters/objects/IronKey.png", 
         id: "Iron Master Key"
       }),
       key2: new Key({
-        x: utils.withGrid(38), 
-        y: utils.withGrid(44),
+        x: utils.withGrid(47), 
+        y: utils.withGrid(33),
         src: "/images/characters/objects/SilverKey.png",
         id: "Silver Room Key"
       }),      
-      // Keep the other NPC
-      npcB: new Person({
-        x: utils.withGrid(8),
-        y: utils.withGrid(5),
-        src: "/images/characters/people/npc2.png",
-        talking: [
-          {
-            events: [
-              { type: "textMessage", text: "Have you seen Elliot's ghost?", faceHero: "npcB" },
-              { type: "textMessage", text: "They say he can't pass on until all his keys are found." },
-              { type: "textMessage", text: "I think one of his keys might be hidden in the kitchen." },
-              { type: "textMessage", text: "Poor Elliot, he was the hotel manager you know..." },
-            ]
-          }
-        ]
-      }),
+
+//MODIFY
       npcC: new Person({
         x: utils.withGrid(11),
         y: utils.withGrid(9),
@@ -513,21 +538,24 @@ window.OverworldMaps = {
         ]
       }),
     },
-    walls: {
-      [utils.asGridCoord(7,6)] : true,
-      [utils.asGridCoord(8,6)] : true,
-      [utils.asGridCoord(7,7)] : true,
-      [utils.asGridCoord(8,7)] : true,
-      // Add walls for the keys
-      [utils.asGridCoord(3,4)] : true,
-      [utils.asGridCoord(10,2)] : true,
-    },
+
+    entryPoints: {
+      "Garden": utils.asGridCoord(26, 58),  // Coming FROM Garden, land here
+      "Hallway": utils.asGridCoord(58, 37) // Coming FROM Hallway, land here (Adjust Y if needed)
+  },
     cutsceneSpaces: {
 
-      [utils.asGridCoord(28, 49)]: [
+      [utils.asGridCoord(26, 55)]: [
         {
           events: [
             { type: "textMessage", text: "<i>The air is different here. Thicker. Like breathing through memories that aren't mine.<i>" }
+          ]
+        }
+      ],
+      [utils.asGridCoord(25, 54)]: [
+        {
+          events: [
+            { type: "textMessage", text: "It's not time to leave yet!" }
           ]
         }
       ],
@@ -537,7 +565,7 @@ window.OverworldMaps = {
           events: [
             { who: "npcB", type: "walk",  direction: "left" },
             { who: "npcB", type: "stand",  direction: "up", time: 500 },
-            { type: "textMessage", text:"I've heard there's a key hidden in the kitchen!"},
+            { type: "textMessage", text:"I've heard there's a key hidden in the Hallway!"},
             { type: "textMessage", text:"Elliot used to carry all his keys with him everywhere."},
             { who: "npcB", type: "walk",  direction: "right" },
             { who: "hero", type: "walk",  direction: "down" },
@@ -545,81 +573,81 @@ window.OverworldMaps = {
           ]
         }
       ],      
-      [utils.asGridCoord(5,10)]: [ // Transition point at (5, 10)
+      [utils.asGridCoord(58,38)]: [ 
         {
           events: [
-            { type: "changeMap", map: "Kitchen" }
+            { type: "changeMap", map: "Hallway" }
           ]
         }
       ],
     }
   },
-  Kitchen: {
-    lowerSrc: "/images/maps/KitchenLower.png",
-    upperSrc: "/images/maps/KitchenUpper.png",
-    gameObjects: {
+
+  Hallway: {
+    id: "Hallway",
+    lowerSrc: "/images/maps/HallwayLower.png",
+    upperSrc: "/images/maps/HallwayUpper.png",
+    collisionMaskSrc: "/images/maps/HallwayCollisionMask.png",
+    gameObjects: { // <-- gameObjects starts here
       hero: new Person({
         isPlayerControlled: true,
-        x: utils.withGrid(5),
-        y: utils.withGrid(5),
+        x: utils.withGrid(1),
+        y: utils.withGrid(20),
       }),
-      npcB: new Person({
-        x: utils.withGrid(10),
-        y: utils.withGrid(8),
-        src: "/images/characters/people/npc3.png",
-        talking: [
-          {
-            events: [
-              { type: "textMessage", text: "I think I saw a key around here somewhere...", faceHero:"npcB" },
-              { type: "textMessage", text: "Elliot always loved this kitchen." },
-              { type: "textMessage", text: "He'd hide his spare keys in strange places." },
-              { type: "textMessage", text: "Check the corners, maybe?" },
-            ]
-          }
-        ]
-      }),
-      // Third key in the kitchen
-      key3: new Key({
-        x: utils.withGrid(2),
-        y: utils.withGrid(7),
-        src: "/images/characters/objects/GoldenKey.png",
-        id: "Gold Safe Key"
-      }),      
     },
-    walls: {
-      // Add walls for the key
-      [utils.asGridCoord(2,7)] : true,
-    },
+        // Define where player lands IN Hallway coming FROM other maps
+        entryPoints: {
+          "Lobby": utils.asGridCoord(1, 20),   // Coming FROM Lobby, land here
+          "Room1": utils.asGridCoord(13, 16), // Coming FROM Room1, land here (Adjust Y if needed)
+          "Room2": utils.asGridCoord(28, 16), // Coming FROM Room2, land here (Adjust Y if needed)
+          "Bathroom": utils.asGridCoord(50, 19) // Coming FROM Bathroom, land here (Adjust Y if needed)
+          // Add "Street" if there's a transition from Street to Hallway
+      },
     cutsceneSpaces: {
-      [utils.asGridCoord(5,10)]: [ // Transition point TO Street
+      [utils.asGridCoord(10,20)]: [
         {
-          // OLD: Direct map change
-          // events: [
-          //   { type: "changeMap", map: "Street" }
-          // ]
-
-          // NEW: Conditional map change
+          events: [
+            { type: "textMessage", text: "<i>Something's pulling at me. A tugging behind my ribs with each step deeper into this place.<i>" },
+            { type: "textMessage", text: "<i>I'm beginning to understand. This isn't just about finding lost items. This is about finding lost pieces of these people. These... remnants.<i>" }
+          ]
+        }
+      ],
+      
+      [utils.asGridCoord(13,15)]: [ 
+        {
+          events: [
+            { type: "changeMap", map: "Room1" }
+          ]
+        }
+      ],
+      [utils.asGridCoord(28,15)]: [ 
+        {
+          events: [
+            { type: "changeMap", map: "Room2" }
+          ]
+        }
+      ],
+      [utils.asGridCoord(50,20)]: [
+        {
           events: [
             (map) => { // Use a function to add logic
               if (utils.gameProgress.chapter1Completed) {
                 // Chapter 1 is done, allow entry to Street
                 return [
-                  { type: "changeMap", map: "Street" }
+                  { type: "changeMap", map: "Bathroom" }
                 ];
               } else {
                 // Chapter 1 is NOT done, block entry
                 return [
                   { type: "textMessage", text: "The way forward seems blocked by lingering spectral energy..." },
                   { type: "textMessage", text: "(Maybe I should finish helping Elliot first?)" }
-                  // Optional: Move the hero back one step
-                  // { who: "hero", type: "walk", direction: "up" }, // Assuming down was the direction to trigger
                 ];
               }
             }
           ]
         }
       ],
-      [utils.asGridCoord(5,4)]: [
+      [utils.asGridCoord(1,20)]: [
         {
           events: [
             { type: "changeMap", map: "Lobby" }
@@ -628,8 +656,68 @@ window.OverworldMaps = {
       ]      
     }
   },
-  // Add this new map to your OverworldMaps object
-  Street: { // Changed "Kitchen" to "Street"
+
+  Room1: {
+    id: "Room1",
+    lowerSrc: "/images/maps/Room1Lower.png",
+    upperSrc: "/images/maps/Room1Upper.png",
+    collisionMaskSrc: "/images/maps/Room1CollisionMask.png",
+    gameObjects: {
+      hero: new Person({
+        isPlayerControlled: true,
+        x: utils.withGrid(30),
+        y: utils.withGrid(50),
+      }),
+
+      key3: new Key({
+        x: utils.withGrid(25),
+        y: utils.withGrid(46),
+        src: "/images/characters/objects/GoldenKey.png",
+        id: "Gold Safe Key"
+      }),      
+
+      Marilyn: new Person({
+        x: utils.withGrid(30),
+        y: utils.withGrid(40),
+        src: "/images/characters/people/marilyn.png",
+        talking: [
+          {
+            events: [
+              { type: "textMessage", text: "<g>You're not the usual one they send. The others couldn't see us. Just moved things around, made noise.<g>", faceHero: "Marilyn" },
+              { type: "textMessage", text: "<g>You're different. There's more to you.<g>", faceHero: "Marilyn" },
+              { type: "textMessage", text: "I'm looking for keys. For Elliot." },
+              { type: "textMessage", text: "<g>Elliot. Poor boy. Always so dedicated. One of his keys is here, yes. I've kept it safe.<g>", faceHero: "Marilyn" },
+              { type: "textMessage", text: "And what's keeping you here?" },
+              { type: "textMessage", text: "<g>My name. They've forgotten my name. All those years being somebody, and now... no one remembers who I was.<g>", faceHero: "Marilyn" },
+              { type: "textMessage", text: "<i>There's a guestbook in the lobby. Maybe I can find her there.<i>" },
+              { type: "textMessage", text: "I'll come back for you." },
+              { type: "textMessage", text: "<g>They all say that, darling.<g>", faceHero: "Marilyn" }
+            ]
+          }
+        ]
+      }),      
+  },     entryPoints: {
+    "Hallway": utils.asGridCoord(30, 50) // Coming FROM Hallway, land here
+},
+cutsceneSpaces:{
+    [utils.asGridCoord(30,45)]: [
+      {
+        events: [
+          { type: "textMessage", text: "<i>Room 118. The presidential suite according to the number plate. Someone important stayed here.<i>" },
+        ]
+      }
+    ],
+    [utils.asGridCoord(30,50)]: [
+      {
+        events: [
+          { type: "changeMap", map: "Hallway" }
+        ]
+      }
+    ]      
+  },
+},
+
+  Street: { 
     lowerSrc: "/images/maps/StreetNorthLower.png", // New lower image source
     upperSrc: "/images/maps/StreetNorthUpper.png", // New upper image source
     gameObjects: {
@@ -805,10 +893,10 @@ window.OverworldMaps = {
       [utils.asGridCoord(5,10)]: [
         {
           events: [
-            { type: "changeMap", map: "Kitchen" }
+            { type: "changeMap", map: "Hallway" }
           ]
         }
       ]      
     }
   }
-}
+  }

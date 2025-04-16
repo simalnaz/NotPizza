@@ -3,7 +3,14 @@ class OverworldEvent {
     this.map = map;
     this.event = event;
   }
-
+  callback(resolve) {
+    if (typeof this.event.callback === "function") {
+      this.event.callback(); // Execute the provided function
+    } else {
+      console.warn("Cutscene event 'callback' was called without a valid function.");
+    }
+    resolve(); // Immediately resolve, as the callback is synchronous here
+  }
   stand(resolve) {
     const who = this.map.gameObjects[ this.event.who ];
     who.startBehavior({
@@ -58,9 +65,13 @@ class OverworldEvent {
   }
 
   changeMap(resolve) {
-    this.map.overworld.startMap( window.OverworldMaps[this.event.map] );
+      const targetMapName = this.event.map;
+      const sourceMapId = this.map.config.id; // Get the ID of the current map we are LEAVING
+  
+    // Pass the sourceMapId to startMap
+    this.map.overworld.startMap( window.OverworldMaps[targetMapName], sourceMapId );
     resolve();
-  }
+}
   
   // Add a new event type for removing objects
   removeObject(resolve) {

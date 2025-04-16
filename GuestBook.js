@@ -31,6 +31,37 @@ class GuestBook {
         description: "plays the violin at midnight",
         yearVisited: 1919,
         disappeared: false
+      },
+      // Adding your requested ghosts
+      "Elliot": {
+        room: 118,
+        description: "carries a golden pocket watch", // Based on init.js
+        yearVisited: 1925,
+        disappeared: false
+      },
+      "Thomas Henderson": {
+        room: 304,
+        description: "wears a navy blue suit",
+        yearVisited: 1938,
+        disappeared: false
+      },
+      "Eleanor Henderson": {
+        room: 305,
+        description: "has a pearl necklace",
+        yearVisited: 1938,
+        disappeared: false
+      },
+      "Reginald Foster": {
+        room: 421,
+        description: "smokes a wooden pipe",
+        yearVisited: 1912,
+        disappeared: false
+      },
+      "Marilyn Winters": {
+        room: 156,
+        description: "carries a red umbrella",
+        yearVisited: 1957,
+        disappeared: false
       }
     };
     

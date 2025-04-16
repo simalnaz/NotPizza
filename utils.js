@@ -104,3 +104,53 @@ utils.startInnerMonologueCutscene = function ({
   });
 };
 
+utils.identifyGhost = function(nameOrDetail) {
+  // First check if it's a name
+  if (window.guestBook.entries[nameOrDetail]) {
+    // It's a name
+    window.guestBook.markAsDisappeared(nameOrDetail);
+    
+    // Emit an event that can be used for animations or sound effects
+    utils.emitEvent("ghost-identified", {
+      name: nameOrDetail
+    });
+    
+    // Optional: Update any UI elements
+    const notebookIcon = document.getElementById("notebook-icon");
+    if (notebookIcon) {
+      // Make the notebook icon glow or animate briefly
+      notebookIcon.classList.add("notebook-updated");
+      setTimeout(() => {
+        notebookIcon.classList.remove("notebook-updated");
+      }, 3000);
+    }
+    
+    return true;
+  } 
+  // Then check if it's a remembered detail
+  else {
+    const name = window.guestBook.getNameByDescription(nameOrDetail);
+    if (name) {
+      // Found the ghost by their remembered detail
+      window.guestBook.markAsDisappeared(name);
+      
+      // Emit an event
+      utils.emitEvent("ghost-identified", {
+        name: name
+      });
+      
+      // Optional: Update UI
+      const notebookIcon = document.getElementById("notebook-icon");
+      if (notebookIcon) {
+        notebookIcon.classList.add("notebook-updated");
+        setTimeout(() => {
+          notebookIcon.classList.remove("notebook-updated");
+        }, 3000);
+      }
+      
+      return true;
+    }
+  }
+  
+  return false;
+};
