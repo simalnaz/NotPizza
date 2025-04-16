@@ -1,368 +1,470 @@
+/* NotebookMenu.css - Updated to match ReverseMenu styling */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(10px); }
+}
+
+@keyframes glow {
+  0% { box-shadow: 0 0 3px rgba(96, 123, 255, 0.5); }
+  50% { box-shadow: 0 0 10px rgba(96, 123, 255, 0.8); }
+  100% { box-shadow: 0 0 3px rgba(96, 123, 255, 0.5); }
+}
+
 .NotebookIcon {
-    position: absolute;
-    top: 12px;
-    left: 12px;
-    width: 32px;
-    height: 32px;
-    background-image: url('/images/icons/notebook.png');
-    background-size: cover;
-    cursor: pointer;
-    z-index: 99;
-    transition: transform 0.2s ease;
-  }
-  
-  .NotebookIcon:hover {
-    transform: scale(1.1);
-  }
-  
-  .NotebookMenu {
-    position: absolute;
-    top: 40px;
-    left: 20px;
-    width: 320px;
-    height: 400px;
-    background: #1a1a1a;
-    color: #eee;
-    border: 2px solid #555;
-    border-radius: 5px;
-    z-index: 100;
-    overflow: hidden;
-    display: none;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-    font-family: 'Arial', sans-serif;
-  }
-  
-  .NotebookMenu.visible {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .NotebookMenu_header {
-    background: #222;
-    padding: 10px;
-    text-align: center;
-    border-bottom: 1px solid #444;
-  }
-  
-  .NotebookMenu_header h2 {
-    margin: 0;
-    font-size: 18px;
-    color: #ffd700;
-  }
-  
-  .NotebookMenu_close {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 24px;
-    height: 24px;
-    background: #333;
-    border: none;
-    border-radius: 12px;
-    color: white;
-    font-size: 18px;
-    line-height: 18px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-  }
-  
-  .NotebookMenu_close:hover {
-    background: #555;
-  }
-  
-  .NotebookMenu_tabs {
-    display: flex;
-    background: #222;
-    border-bottom: 1px solid #444;
-    padding: 0 10px;
-  }
-  
-  .NotebookMenu_tabs button {
-    padding: 8px 12px;
-    margin: 0;
-    background: transparent;
-    color: #ccc;
-    border: none;
-    border-bottom: 2px solid transparent;
-    cursor: pointer;
-    font-size: 14px;
-    transition: all 0.2s ease;
-  }
-  
-  .NotebookMenu_tabs button:hover {
-    color: white;
-    background: #2a2a2a;
-  }
-  
-  .NotebookMenu_tabs button.active {
-    color: #ffd700;
-    border-bottom: 2px solid #ffd700;
-  }
-  
-  .NotebookMenu_section {
-    flex: 1;
-    overflow-y: auto;
-    padding: 10px;
-  }
-  
-  /* Progress Tab Styles */
-  .NotebookMenu_progress h3 {
-    color: #ffd700;
-    margin-bottom: 10px;
-    border-bottom: 1px solid #444;
-    padding-bottom: 5px;
-  }
-  
-  .progress-bar {
-    height: 20px;
-    background: #333;
-    border-radius: 10px;
-    overflow: hidden;
-    margin-bottom: 20px;
-    position: relative;
-  }
-  
-  .progress-fill {
-    height: 100%;
-    background: linear-gradient(to right, #4caf50, #8bc34a);
-    transition: width 0.5s ease;
-  }
-  
-  .ghost-fill {
-    background: linear-gradient(to right, #7e57c2, #b39ddb);
-  }
-  
-  .progress-text {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 12px;
-    font-weight: bold;
-    text-shadow: 0 0 3px rgba(0,0,0,0.8);
-  }
-  
-  .chapter-status {
-    margin-bottom: 20px;
-  }
-  
-  .chapter-item {
-    display: flex;
-    align-items: center;
-    padding: 8px;
-    margin-bottom: 5px;
-    background: #2a2a2a;
-    border-radius: 4px;
-    transition: background 0.2s ease;
-  }
-  
-  .chapter-item.completed {
-    background: #2e3b2e;
-  }
-  
-  .chapter-icon {
-    margin-right: 10px;
-    font-size: 16px;
-  }
-  
-  .chapter-name {
-    font-size: 14px;
-  }
-  
-  /* Ghosts Tab Styles */
-  .NotebookMenu_ghosts h3 {
-    color: #ffd700;
-    margin-bottom: 5px;
-    border-bottom: 1px solid #444;
-    padding-bottom: 5px;
-  }
-  
-  .ghost-stats {
-    margin-bottom: 15px;
-    font-style: italic;
-    color: #bbb;
-    font-size: 14px;
-  }
-  
-  .ghost-section {
-    margin-bottom: 20px;
-  }
-  
-  .ghost-section h4 {
-    color: #b39ddb;
-    margin-bottom: 10px;
-  }
-  
-  .ghost-grid {
-    display: grid;
-    grid-template-columns: repeat(1, 1fr);
-    gap: 10px;
-  }
-  
-  .ghost-card {
-    background: #2a2a2a;
-    padding: 10px;
-    border-radius: 4px;
-    border-left: 3px solid #7e57c2;
-  }
-  
-  .ghost-name {
-    font-weight: bold;
-    margin-bottom: 5px;
-    color: #ddd;
-  }
-  
-  .ghost-detail {
-    font-size: 13px;
-    color: #aaa;
-    font-style: italic;
-  }
-  
-  .empty-message {
-    color: #777;
-    font-style: italic;
-    text-align: center;
-    padding: 10px;
-  }
-  
-  /* Chapters Tab Styles */
-  .NotebookMenu_chapters h3 {
-    color: #ffd700;
-    margin-bottom: 5px;
-    border-bottom: 1px solid #444;
-    padding-bottom: 5px;
-  }
-  
-  .NotebookMenu_chapters > p {
-    margin-bottom: 15px;
-    font-style: italic;
-    color: #bbb;
-    font-size: 14px;
-  }
-  
-  .chapter-accordion {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-  }
-  
-  .chapter-header {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    background: #2a2a2a;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background 0.2s ease;
-  }
-  
-  .chapter-header:hover {
-    background: #333;
-  }
-  
-  .chapter-toggle {
-    margin-right: 10px;
-    color: #ffd700;
-    font-size: 12px;
-  }
-  
-  .chapter-title {
-    flex: 1;
-    font-weight: bold;
-  }
-  
-  .chapter-status {
-    font-size: 12px;
-    color: #aaa;
-  }
-  
-  .chapter-content {
-    display: none;
-    padding: 10px;
-    background: #222;
-    border-radius: 0 0 4px 4px;
-    margin-top: -5px;
-    margin-bottom: 10px;
-    border-left: 2px solid #444;
-  }
-  
-  .chapter-content.expanded {
-    display: block;
-  }
-  
-  .chapter-description h4 {
-    color: #8bc34a;
-    margin-top: 0;
-    margin-bottom: 10px;
-  }
-  
-  .chapter-description p {
-    margin-bottom: 15px;
-  }
-  
-  .dsa-info {
-    background: #292929;
-    padding: 10px;
-    border-radius: 4px;
-    margin-bottom: 15px;
-    border-left: 3px solid #8bc34a;
-  }
-  
-  .dsa-info h5 {
-    color: #8bc34a;
-    margin-top: 0;
-    margin-bottom: 8px;
-  }
-  
-  .dsa-info p {
-    margin-bottom: 10px;
-  }
-  
-  .dsa-info ul {
-    padding-left: 20px;
-    margin-bottom: 10px;
-  }
-  
-  .dsa-info li {
-    margin-bottom: 5px;
-    font-size: 13px;
-  }
-  
-  .dsa-info code {
-    background: #333;
-    padding: 2px 4px;
-    border-radius: 3px;
-    font-family: monospace;
-    font-size: 12px;
-  }
-  
-  .chapter-hints {
-    background: #292929;
-    padding: 10px;
-    border-radius: 4px;
-    border-left: 3px solid #ffd700;
-  }
-  
-  .chapter-hints h5 {
-    color: #ffd700;
-    margin-top: 0;
-    margin-bottom: 8px;
-  }
-  
-  .chapter-hints ul {
-    padding-left: 20px;
-    margin-bottom: 0;
-  }
-  
-  .chapter-hints li {
-    margin-bottom: 5px;
-    font-size: 13px;
-  }
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 20px;
+  height: 20px;
+  background-image: url('/images/icons/notebook.png');
+  background-size: cover;
+  cursor: pointer;
+  z-index: 99;
+  transition: transform 0.2s ease;
+  opacity: 0.8;
+}
+
+.NotebookIcon:hover {
+  transform: scale(1.1);
+  opacity: 1;
+  box-shadow: 0 0 5px rgba(96, 123, 255, 0.5);
+}
+
+.NotebookMenu {
+  position: absolute;
+  top: 30px;
+  left: 20px;
+  width: 300px;
+  height: 150px;
+  background: rgba(20, 20, 35, 0.95);
+  color: white;
+  border: 2px solid #6677cc;
+  border-radius: 8px;
+  z-index: 100;
+  overflow: hidden;
+  display: none;
+  box-shadow: 0 0 10px rgba(96, 123, 255, 0.3);
+  font-family: 'Georgia', serif;
+  transition: opacity 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.NotebookMenu.visible {
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.3s ease forwards;
+}
+
+.NotebookMenu.closing {
+  animation: fadeOut 0.3s ease forwards;
+}
+
+.NotebookMenu_header {
+  background: linear-gradient(to bottom, #334 0%, #223 100%);
+  padding: 10px;
+  text-align: center;
+  border-bottom: 1px solid #4455aa;
+}
+
+.NotebookMenu_header h2 {
+  margin: 0;
+  font-size: 16px;
+  color: #e0e0ff;
+  text-shadow: 0 0 5px rgba(96, 123, 255, 0.5);
+  font-weight: normal;
+}
+
+.NotebookMenu_close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(to bottom, #5566bb 0%, #4455aa 100%);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 18px;
+  line-height: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.NotebookMenu_close:hover {
+  background: linear-gradient(to bottom, #6677cc 0%, #5566bb 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3);
+}
+
+.NotebookMenu_close:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.NotebookMenu_tabs {
+  display: flex;
+  background: linear-gradient(to bottom, #334 0%, #223 100%);
+  border-bottom: 1px solid #4455aa;
+  padding: 0 10px;
+}
+
+.NotebookMenu_tabs button {
+  padding: 8px 12px;
+  margin: 0;
+  background: transparent;
+  color: #ccc;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  font-family: 'Georgia', serif;
+}
+
+.NotebookMenu_tabs button:hover {
+  color: #e0e0ff;
+  background: rgba(96, 123, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.NotebookMenu_tabs button.active {
+  color: #e0e0ff;
+  border-bottom: 2px solid #6677cc;
+  text-shadow: 0 0 5px rgba(96, 123, 255, 0.5);
+}
+
+.NotebookMenu_section {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+  background: rgba(20, 20, 35, 0.5);
+}
+
+/* Progress Tab Styles */
+.NotebookMenu_progress h3 {
+  color: #e0e0ff;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #4455aa;
+  padding-bottom: 5px;
+  text-shadow: 0 0 5px rgba(96, 123, 255, 0.5);
+  font-weight: normal;
+}
+
+.progress-bar {
+  height: 20px;
+  background: rgba(40, 40, 60, 0.6);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 20px;
+  position: relative;
+  border: 1px solid #4455aa;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(to right, #5566bb, #6677cc);
+  transition: width 0.5s ease;
+}
+
+.ghost-fill {
+  background: linear-gradient(to right, #7e57c2, #b39ddb);
+}
+
+.progress-text {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  text-shadow: 0 0 3px rgba(0,0,0,0.8);
+}
+
+.chapter-status {
+  margin-bottom: 20px;
+}
+
+.chapter-item {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  margin-bottom: 5px;
+  background: linear-gradient(to bottom, #334 0%, #223 100%);
+  border: 1px solid #4455aa;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.chapter-item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 5px rgba(96, 123, 255, 0.3);
+  border-color: #6677cc;
+}
+
+.chapter-item.completed {
+  background: linear-gradient(to bottom, #2e3b2e, #223322);
+  border-color: #55aa66;
+}
+
+.chapter-icon {
+  margin-right: 10px;
+  font-size: 16px;
+  color: #6677cc;
+}
+
+.chapter-name {
+  font-size: 14px;
+  color: #e0e0ff;
+}
+
+/* Ghosts Tab Styles */
+.NotebookMenu_ghosts h3 {
+  color: #e0e0ff;
+  margin-bottom: 5px;
+  border-bottom: 1px solid #4455aa;
+  padding-bottom: 5px;
+  text-shadow: 0 0 5px rgba(96, 123, 255, 0.5);
+  font-weight: normal;
+}
+
+.ghost-stats {
+  margin-bottom: 15px;
+  font-style: italic;
+  color: #bbb;
+  font-size: 14px;
+}
+
+.ghost-section {
+  margin-bottom: 20px;
+}
+
+.ghost-section h4 {
+  color: #b39ddb;
+  margin-bottom: 10px;
+  text-shadow: 0 0 5px rgba(150, 123, 255, 0.5);
+}
+
+.ghost-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 10px;
+}
+
+.ghost-card {
+  background: linear-gradient(to bottom, #334 0%, #223 100%);
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #4455aa;
+  border-left: 3px solid #7e57c2;
+  transition: all 0.2s ease;
+}
+
+.ghost-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 5px rgba(150, 123, 255, 0.3);
+  border-color: #7e57c2;
+}
+
+.ghost-name {
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #e0e0ff;
+}
+
+.ghost-detail {
+  font-size: 13px;
+  color: #aaa;
+  font-style: italic;
+}
+
+.empty-message {
+  color: #777;
+  font-style: italic;
+  text-align: center;
+  padding: 10px;
+}
+
+/* Chapters Tab Styles */
+.NotebookMenu_chapters h3 {
+  color: #e0e0ff;
+  margin-bottom: 5px;
+  border-bottom: 1px solid #4455aa;
+  padding-bottom: 5px;
+  text-shadow: 0 0 5px rgba(96, 123, 255, 0.5);
+  font-weight: normal;
+}
+
+.NotebookMenu_chapters > p {
+  margin-bottom: 15px;
+  font-style: italic;
+  color: #bbb;
+  font-size: 14px;
+}
+
+.chapter-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.chapter-header {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background: linear-gradient(to bottom, #334 0%, #223 100%);
+  border: 1px solid #4455aa;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.chapter-header:hover {
+  background: linear-gradient(to bottom, #445 0%, #334 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 5px rgba(96, 123, 255, 0.3);
+  border-color: #6677cc;
+}
+
+.chapter-toggle {
+  margin-right: 10px;
+  color: #6677cc;
+  font-size: 12px;
+}
+
+.chapter-title {
+  flex: 1;
+  font-weight: bold;
+  color: #e0e0ff;
+}
+
+.chapter-status {
+  font-size: 12px;
+  color: #aaa;
+}
+
+.chapter-content {
+  display: none;
+  padding: 10px;
+  background: rgba(30, 30, 45, 0.8);
+  border-radius: 0 0 4px 4px;
+  margin-top: -5px;
+  margin-bottom: 10px;
+  border: 1px solid #4455aa;
+  border-top: none;
+}
+
+.chapter-content.expanded {
+  display: block;
+  animation: fadeIn 0.3s ease forwards;
+}
+
+.chapter-description h4 {
+  color: #e0e0ff;
+  margin-top: 0;
+  margin-bottom: 10px;
+  text-shadow: 0 0 5px rgba(96, 123, 255, 0.5);
+}
+
+.chapter-description p {
+  margin-bottom: 15px;
+  color: #ccc;
+}
+
+.dsa-info {
+  background: rgba(40, 40, 60, 0.6);
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  border: 1px solid #4455aa;
+  border-left: 3px solid #6677cc;
+}
+
+.dsa-info h5 {
+  color: #e0e0ff;
+  margin-top: 0;
+  margin-bottom: 8px;
+  text-shadow: 0 0 5px rgba(96, 123, 255, 0.5);
+}
+
+.dsa-info p {
+  margin-bottom: 10px;
+  color: #ccc;
+}
+
+.dsa-info ul {
+  padding-left: 20px;
+  margin-bottom: 10px;
+}
+
+.dsa-info li {
+  margin-bottom: 5px;
+  font-size: 13px;
+  color: #bbb;
+}
+
+.dsa-info code {
+  background: rgba(60, 60, 80, 0.6);
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-family: monospace;
+  font-size: 12px;
+  color: #e0e0ff;
+  border: 1px solid #4455aa;
+}
+
+.chapter-hints {
+  background: rgba(40, 40, 60, 0.6);
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #4455aa;
+  border-left: 3px solid #6677cc;
+}
+
+.chapter-hints h5 {
+  color: #e0e0ff;
+  margin-top: 0;
+  margin-bottom: 8px;
+  text-shadow: 0 0 5px rgba(96, 123, 255, 0.5);
+}
+
+.chapter-hints ul {
+  padding-left: 20px;
+  margin-bottom: 0;
+}
+
+.chapter-hints li {
+  margin-bottom: 5px;
+  font-size: 13px;
+  color: #bbb;
+}
+
+/* Ensure scrollbar is thin and styled */
+.NotebookMenu::-webkit-scrollbar,
+.NotebookMenu_section::-webkit-scrollbar {
+  width: 5px;
+}
+
+.NotebookMenu::-webkit-scrollbar-track,
+.NotebookMenu_section::-webkit-scrollbar-track {
+  background: rgba(20, 20, 35, 0.5);
+}
+
+.NotebookMenu::-webkit-scrollbar-thumb,
+.NotebookMenu_section::-webkit-scrollbar-thumb {
+  background: #4455aa;
+  border-radius: 3px;
+}

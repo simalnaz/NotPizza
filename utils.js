@@ -78,3 +78,29 @@ const utils = {
     chapter3Completed: false,
   }
 };
+
+// cutsceneUtils.js
+
+utils.startInnerMonologueCutscene = function ({
+  text,
+  flag = "innerMonologuePlayed",
+  onComplete = null
+}) {
+  if (window[flag]) return;
+  window[flag] = true;
+
+  const events = [
+    {
+      type: "textMessage",
+      text: `<i>${text}</i>`
+    }
+  ];
+
+  // Start the cutscene
+  window.overworld.map.startCutscene(events).then(() => {
+    if (typeof onComplete === "function") {
+      onComplete();
+    }
+  });
+};
+

@@ -51,7 +51,7 @@ class Person extends GameObject {
 
       //Ready to walk!
       state.map.moveWall(this.x, this.y, this.direction);
-      this.movingProgressRemaining = 16;
+      this.movingProgressRemaining = 8;
     }
 
     if (behavior.type === "stand") {
@@ -68,7 +68,8 @@ class Person extends GameObject {
 
   updatePosition() {
       const [property, change] = this.directionUpdate[this.direction];
-      this[property] += change;
+      const pixelsPerFrame = 2; // 16 pixels / 8 frames = 2 pixels/frame
+      this[property] += change * pixelsPerFrame;
       this.movingProgressRemaining -= 1;
 
       if (this.movingProgressRemaining === 0) {

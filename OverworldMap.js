@@ -5,6 +5,8 @@ class OverworldMap {
     this.cutsceneSpaces = config.cutsceneSpaces || {};
     this.walls = config.walls || {};
 
+    this.config = config;
+
     this.lowerImage = new Image();
     this.lowerImage.src = config.lowerSrc;
 
@@ -16,60 +18,129 @@ class OverworldMap {
     this.isLoaded = false;
   }
 
-  // NEW: Method that returns a Promise which resolves when images are loaded
-  waitForLoad() {
+  // --- ADD THE NEW METHOD HERE (or after waitForLoad) ---
+  loadCollisionMask() {
+    // Return a promise for consistency with waitForLoad
     return new Promise(resolve => {
-      // Check if already loaded (e.g., if switching maps)
-      if (this.lowerImage.complete && this.upperImage.complete) {
-         this.isLoaded = true;
-         resolve();
-         return;
+      // If no mask source, resolve immediately
+      if (!this.config.collisionMaskSrc) {
+        console.log("No collision mask specified, skipping load.");
+        resolve();
+        return;
       }
 
-      let lowerLoaded = false;
-      let upperLoaded = false;
+      console.log(`Loading collision mask: ${this.config.collisionMaskSrc}`);
+      const image = new Image();
+      image.src = this.config.collisionMaskSrc;
 
-      const checkBothLoaded = () => {
-        if (lowerLoaded && upperLoaded) {
-          this.isLoaded = true;
-          console.log(`Map images loaded for: ${this.lowerImage.src}`); // Debug log
-          resolve();
+      image.onload = () => {
+        console.log(`Collision mask loaded: ${this.config.collisionMaskSrc}`);
+        const canvas = document.createElement("canvas");
+        canvas.width = image.width;
+        canvas.height = image.height;
+        const ctx = canvas.getContext("2d", { willReadFrequently: true }); // Optimization hint
+        ctx.drawImage(image, 0, 0);
+
+        try {
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          let wallCount = 0;
+
+          let collisionOffsetX = 0; // Always 0 now
+          let collisionOffsetY = 0; // Default to 0
+
+          // Check if this is the Lobby map based on its collision mask source
+          // Make sure this path exactly matches the one in window.OverworldMaps.Lobby
+          if (this.config.collisionMaskSrc === "/images/maps/LobbyLowerCollisionMask.png") {
+            console.log("Applying Lobby-specific DOWNWARD collision offset.");
+            // Apply ONLY the downward offset for the Lobby map
+            // collisionOffsetX remains 0
+            collisionOffsetX = 1;
+            collisionOffsetY = 1; // Shift collision 1 grid unit (16px) DOWN
+          }
+
+          for (let y = 0; y < canvas.height; y++) {
+            for (let x = 0; x < canvas.width; x++) {
+
+              // Calculate grid coordinates where the wall will be placed, applying offsets
+              // collisionOffsetX will be 0 for all maps
+              // collisionOffsetY will be 1 for Lobby, 0 otherwise
+              const gridX = utils.withGrid(x + collisionOffsetX);
+              const gridY = utils.withGrid(y + collisionOffsetY);
+
+              // Sample the center of the grid cell in the mask image
+              const maskPixelX = x * 16 + 8; // Sample center X (Keep sampling based on original x)
+              const maskPixelY = y * 16 + 8; // Sample center Y (Keep sampling based on original y)
+
+              // Ensure sample coordinates are within image bounds
+              if (maskPixelX < image.width && maskPixelY < image.height) {
+                const i = (Math.floor(maskPixelY) * image.width + Math.floor(maskPixelX)) * 4;
+                const r = imageData.data[i];
+                const g = imageData.data[i + 1];
+                const b = imageData.data[i + 2];
+            
+                // Red pixel (allow some tolerance for anti-aliasing/compression)
+                if (r > 200 && g < 50 && b < 50) {
+                  // Place the wall at the OFFSET grid coordinate
+                  const key = `${gridX},${gridY}`; // <-- USES OFFSET gridX
+                  this.walls[key] = true;
+                  wallCount++;
+              }
+              }
+            }
+          }
+          console.log(`Added ${wallCount} walls from collision mask.`);
+        } catch (e) {
+           console.error("Error processing collision mask:", e);
+           // Potentially handle CORS issues if loading from different origin
+           if (e.name === 'SecurityError') {
+              console.error("Could not read pixel data. Ensure the collision mask image is served from the same origin or has appropriate CORS headers.");
+           }
         }
+        resolve(); // Resolve the promise once done
       };
 
-      this.lowerImage.onload = () => {
-        lowerLoaded = true;
-        checkBothLoaded();
+      image.onerror = () => {
+        console.error(`Failed to load collision mask image: ${this.config.collisionMaskSrc}`);
+        resolve(); // Resolve even on error so loading doesn't hang
       };
-      this.lowerImage.onerror = () => {
-         console.error(`Failed to load lower image: ${this.lowerImage.src}`);
-         lowerLoaded = true; // Still count as "done" loading, even if failed
-         checkBothLoaded();
-      }
-
-      this.upperImage.onload = () => {
-        upperLoaded = true;
-        checkBothLoaded();
-      };
-       this.upperImage.onerror = () => {
-         console.error(`Failed to load upper image: ${this.upperImage.src}`);
-         upperLoaded = true; // Still count as "done" loading, even if failed
-         checkBothLoaded();
-      }
-
-      // Handle cases where images might already be cached/complete before onload attaches
-      if (this.lowerImage.complete) {
-         lowerLoaded = true;
-         checkBothLoaded();
-      }
-      if (this.upperImage.complete) {
-         upperLoaded = true;
-         checkBothLoaded();
-      }
-
     });
   }
+  // --- END OF NEW METHOD ---
 
+  // MODIFIED waitForLoad to include collision mask loading
+  waitForLoad() {
+    const lowerPromise = new Promise(resolve => {
+      if (this.lowerImage.complete) { resolve(); return; }
+      this.lowerImage.onload = resolve;
+      this.lowerImage.onerror = () => {
+        console.error(`Failed to load lower image: ${this.lowerImage.src}`);
+        resolve(); // Resolve on error
+      };
+    });
+
+    const upperPromise = new Promise(resolve => {
+      if (this.upperImage.complete) { resolve(); return; }
+      this.upperImage.onload = resolve;
+      this.upperImage.onerror = () => {
+        console.error(`Failed to load upper image: ${this.upperImage.src}`);
+        resolve(); // Resolve on error
+      };
+    });
+
+    // Add the collision mask loading promise
+    const collisionMaskPromise = this.loadCollisionMask(); // <-- CALL THE NEW METHOD
+
+    // Wait for ALL promises (lower, upper, collision mask) to resolve
+    return Promise.all([lowerPromise, upperPromise, collisionMaskPromise]).then(() => {
+      this.isLoaded = true; // Mark as loaded only after everything is done
+      console.log(`Map assets fully loaded for: ${this.config.lowerSrc}`);
+      // No need to resolve explicitly here, Promise.all handles it.
+    }).catch(error => {
+       console.error("Error during map asset loading:", error);
+       // Still might want to mark as loaded or handle error state
+       this.isLoaded = true; // Or false depending on desired behavior on error
+    });
+  }
   drawLowerImage(ctx, cameraPerson) {
     ctx.drawImage(
       this.lowerImage,
@@ -111,6 +182,7 @@ class OverworldMap {
     })
   }
 
+
   async startCutscene(events) {
     this.isCutscenePlaying = true;
 
@@ -120,6 +192,14 @@ class OverworldMap {
         map: this,
       })
       await eventHandler.init();
+    }
+
+    if (event.type === "centerText") {
+      const centerText = new CenterTextDisplay({
+        text: event.text,
+        duration: event.duration || 3000
+      });
+      centerText.init(resolve);
     }
 
     this.isCutscenePlaying = false;
@@ -183,17 +263,17 @@ class OverworldMap {
       return;
     }
 
-    if (window.elliotShouldFade && this.gameObjects["npcA"]) {
+    if (window.elliotShouldFade && this.gameObjects["Elliot"]) {
       window.elliotShouldFade = false;
     
       this.startCutscene([
-        { type: "textMessage", text: "You found all my keys!", faceHero: "npcA" },
+        { type: "textMessage", text: "You found all my keys!", faceHero: "Elliot" },
         { type: "textMessage", text: "Now I can finally pass on to the afterlife..." },
         { type: "textMessage", text: "Thank you for your help!" },
-        { who: "npcA", type: "walk", direction: "up" },
-        { who: "npcA", type: "stand", direction: "up", time: 500 },
+        { who: "Elliot", type: "walk", direction: "up" },
+        { who: "Elliot", type: "stand", direction: "up", time: 500 },
         { type: "textMessage", text: "Elliot's ghost fades away peacefully..." },
-        { type: "removeObject", objectId: "npcA" },
+        { type: "removeObject", objectId: "Elliot" },
         { type: "textMessage", text: "You feel a warm breeze... the ghost has moved on." }
       ]);
     
@@ -251,6 +331,7 @@ class OverworldMap {
 
     // Check if not playing, match exists, and match has at least one cutscene config
     if (!this.isCutscenePlaying && match && match.length > 0) {
+      console.log(`  ✅ Match found and not playing for ${coord}. Starting cutscene...`);
 
       let eventsToRun = match[0].events; // Get the potential events array or function array
 
@@ -288,49 +369,97 @@ class OverworldMap {
 }
 
 window.OverworldMaps = {
-  Lobby: {
-    lowerSrc: "/images/maps/LobbyLower.png",
-    upperSrc: "/images/maps/LobbyUpper.png",
+
+  Garden: {
+    lowerSrc: "/images/maps/HotelGardenLower.png",
+    upperSrc: "/images/maps/HotelGardenUpper.png",
+    collisionMaskSrc:"/images/maps/HotelGardenCollisionMask.png",
     gameObjects: {
       hero: new Person({
         isPlayerControlled: true,
-        x: utils.withGrid(24),
-        y: utils.withGrid(40),
+        x: utils.withGrid(25),
+        y: utils.withGrid(56),
+  }),
+},
+  cutsceneSpaces: {
+    [utils.asGridCoord(26,24)]: [ 
+      { 
+        events: [ 
+          (map) => { 
+            if (window.letterRead) {
+              return [
+                { type: "changeMap", map: "Lobby" }
+              ]; 
+            } else {
+              return [
+                {
+                  type: "textMessage",
+                  text: "I should read the letter first before leaving the garden."
+                } ];
+            }
+          } 
+        ] 
+      } 
+    ], 
+    [utils.asGridCoord(26,26)]: [{
+      events: [
+        {
+          type: "textMessage",
+          text: `<i>Thornfield Hotel. Been abandoned for what, twenty years? Yet someone's keeping those roses alive.</i>`
+        }
+      ]
+    }]
+  },
+},
+
+  Lobby: {
+    lowerSrc: "/images/maps/LobbyLower.png",
+    upperSrc: "/images/maps/LobbyUpper.png",
+    collisionMaskSrc: "/images/maps/LobbyLowerCollisionMask.png",
+    gameObjects: {
+      hero: new Person({
+        isPlayerControlled: true,
+        x: utils.withGrid(28),
+        y: utils.withGrid(56),
       }),
-      npcA: new Person({
-        x: utils.withGrid(7),
-        y: utils.withGrid(9),
-        src: "/images/characters/people/npc1.png",
-        behaviorLoop: [
-          { type: "stand",  direction: "left", time: 800 },
-          { type: "stand",  direction: "up", time: 800 },
-          { type: "stand",  direction: "right", time: 1200 },
-          { type: "stand",  direction: "up", time: 300 },
-        ],
+      Elliot: new Person({
+        x: utils.withGrid(28),
+        y: utils.withGrid(46),
+        src: "/images/characters/people/elliot.png",
+        //behaviorLoop: [
+          //{ type: "stand",  direction: "left", time: 800 },
+          //{ type: "stand",  direction: "up", time: 800 },
+          //{ type: "stand",  direction: "right", time: 1200 },
+          //{ type: "stand",  direction: "up", time: 300 },
+        //],
         talking: [
           {
             events: [
-              { type: "textMessage", text: "I'm Elliot's ghost...", faceHero: "npcA" },
-              { type: "textMessage", text: "I lost my special keyring before I died." },
-              { type: "textMessage", text: "I need all my keys back to pass on to the afterlife." },
-              { type: "textMessage", text: "Please help me find them around the hotel!" },
-              { type: "textMessage", text: "There should be three keys in total." },
-            ]
+              { type: "textMessage", text: "<g>You... you can see me? Really see me?", faceHero: "Elliot<g>"},
+              { type: "textMessage", text: "<i>His voice echoes like it's traveling through water.<i>" },
+              { type: "textMessage", text: "I can. Are you the one who sent the letter?" },
+              { type: "textMessage", text: "<g>No... but I've been waiting. So long. The keys... I need my keys. Three of them. I was the keeper of all doors, but now I'm... locked out.<g>", faceHero: "Elliot"},
+              { type: "textMessage", text: "What happens if I find them for you?" },
+              { type: "textMessage", text: "<g>I can finish my final rounds. Check on the other guests. Move on. They scattered when it happened. Brass keys. My responsibility.<g>", faceHero: "Elliot"},
+              { type: "textMessage", text: "<i>His eyes hold a hunger I recognise. The desperate need for completion. For an end.<i>" },
+              { type: "textMessage", text: "I'll find them. What's your name?" },
+              { type: "textMessage", text: "<g>Elliot. I was the concierge. I am the concierge. The keys are still in the hotel. They must be. Please.<g>", faceHero: "Elliot" }
+            ]      
           }
         ]
       }),
       // Hidden keys around the map
       key1: new Key({
-        x: utils.withGrid(3),
-        y: utils.withGrid(4),
-        src: "/images/characters/objects/key.png", 
+        x: utils.withGrid(48),
+        y: utils.withGrid(33),
+        src: "/images/characters/objects/IronKey.png", 
         id: "Iron Master Key"
       }),
       key2: new Key({
-        x: utils.withGrid(10), 
-        y: utils.withGrid(2),
-        src: "/images/characters/objects/key.png",
-        id: "Brass Room Key"
+        x: utils.withGrid(38), 
+        y: utils.withGrid(44),
+        src: "/images/characters/objects/SilverKey.png",
+        id: "Silver Room Key"
       }),      
       // Keep the other NPC
       npcB: new Person({
@@ -394,6 +523,15 @@ window.OverworldMaps = {
       [utils.asGridCoord(10,2)] : true,
     },
     cutsceneSpaces: {
+
+      [utils.asGridCoord(28, 49)]: [
+        {
+          events: [
+            { type: "textMessage", text: "<i>The air is different here. Thicker. Like breathing through memories that aren't mine.<i>" }
+          ]
+        }
+      ],
+
       [utils.asGridCoord(7,4)]: [
         {
           events: [
@@ -444,7 +582,7 @@ window.OverworldMaps = {
       key3: new Key({
         x: utils.withGrid(2),
         y: utils.withGrid(7),
-        src: "/images/characters/objects/key.png",
+        src: "/images/characters/objects/GoldenKey.png",
         id: "Gold Safe Key"
       }),      
     },
@@ -500,7 +638,7 @@ window.OverworldMaps = {
         isPlayerControlled: true,
         x: utils.withGrid(5),
         y: utils.withGrid(8),
-        src: "/images/characters/people/hero2.png" // Create this asset
+        src: "/images/characters/people/detective.png" // Create this asset
       }),
       
       // The hotel receptionist NPC to explain the mechanics
@@ -537,7 +675,7 @@ window.OverworldMaps = {
       ghost2: new GhostName({
         x: utils.withGrid(2),
         y: utils.withGrid(3),
-        src: "/images/characters/people/npc1.png",
+        src: "/images/characters/people/elliot.png",
         rememberedDetail: "carries a golden pocket watch",
         id: "ghost2"
       }),
@@ -672,5 +810,5 @@ window.OverworldMaps = {
         }
       ]      
     }
-  },
+  }
 }

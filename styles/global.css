@@ -32,3 +32,50 @@ body {
 .game-container canvas {
   image-rendering: pixelated;
 }
+
+.center-text-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+@font-face {
+  font-family: "alagard";
+  src: url("/images/fonts/alagard.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+.semi-transparent-text {
+  font-family: 'Alagard', serif;
+  font-size: 8px;
+  color: white;
+  padding: 5px 8px;
+  border-radius: 5px;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 1.2s ease-in-out;
+  text-shadow: 0 0 5px #ffffff, 0 0 10px #ffffff, 0 0 15px #ffffff;
+  animation: fadeIn 1.2s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 0.9; }
+}
+
+.fade-out {
+  animation: fadeOut 1.2s ease-in-out forwards;
+}
+
+@keyframes fadeOut {
+  0% { opacity: 0.9; }
+  100% { opacity: 0; }
+}

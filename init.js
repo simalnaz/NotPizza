@@ -1,4 +1,3 @@
-
 (function () {
   // Initialize the Ghosts
   const ghosts = [
@@ -12,7 +11,7 @@
     new GhostName({
       x: utils.withGrid(2),
       y: utils.withGrid(3),
-      src: "/images/characters/people/npc1.png",
+      src: "/images/characters/people/elliot.png",
       rememberedDetail: "carries a golden pocket watch",
       id: "ghost2",
     }),
@@ -31,20 +30,20 @@
   });
 
   window.overworld = overworld; // Make it global
+  overworld.init().catch(console.error);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "L") {
+      overworld.startMap(window.OverworldMaps.Lobby);
+    }
+    if (e.key === "K") {
+      window.elliotShouldFade = true;
+      utils.gameProgress.chapter1Completed = true;
+      utils.keyCollection.keysFound = ["Iron Master Key", "Silver Room Key", "Gold Safe Key"];
+      alert("Chapter 1 complete cheat activated");
+    }
+  });
+  
 
-  // Check if window.OverworldMaps and Lobby exist
-  if (window.OverworldMaps && window.OverworldMaps.Lobby) {
-    // Initialize the Overworld (which now handles starting the map internally and waits)
-    overworld.init(); // This is now async, but we don't necessarily need to await it here
-                      // unless something else depends on init() completing.
-  } else {
-    console.error("Error: window.OverworldMaps.Lobby is not defined. Cannot start game.");
-    // Display an error message to the user on the page
-    document.querySelector(".game-container").innerHTML =
-      '<p style="color: red; padding: 20px;">Error: Failed to load map configuration. Check console.</p>';
-  }
-
-  // REMOVED the redundant overworld.startMap call here
 
   // Initialize NotebookMenu (This is fine here)
   const notebookMenu = new NotebookMenu();
@@ -55,3 +54,70 @@
   });
 
 })();
+
+document.addEventListener("DOMContentLoaded", function() {
+  // Create a flag to track if the letter has been read
+  window.letterRead = false;
+
+  // Reference to the letter icon
+  const letterIcon = document.getElementById("letter-icon");
+
+  // Function to handle letter click
+  function handleLetterClick() {
+    // Stop the letter from shaking
+    letterIcon.style.animation = "none";
+
+    // Hide the letter icon
+    letterIcon.style.display = "none";
+
+    // Set the flag that the letter has been read
+    window.letterRead = true;
+    console.log("[Letter Click] Letter icon clicked! Setting window.letterRead to true.");
+
+    // Start the letter reading cutscene
+    if (window.overworld && window.overworld.map) {
+      console.log("[Letter Click] Starting letter reading text messages...");
+
+      window.overworld.map.startCutscene([
+        // --- Part 1: Reading the Letter ---
+        { type: "textMessage", text: "Dear Detective Lumen," },
+        { type: "textMessage", text: "I hope this letter finds you well. I am writing regarding the troubling situation at the Grand Spectre Hotel." },
+        { type: "textMessage", text: "Several spirits are trapped here, unable to move on to the afterlife." },
+        { type: "textMessage", text: "I believe your unique skills as both a detective and a medium will be invaluable in resolving this matter." },
+        { type: "textMessage", text: "Please come to the hotel garden as soon as possible. I will meet you there to explain the situation in detail." },
+        {
+          type: "textMessage",
+          text: "Sincerely,\nThe Hotel Manager"
+        },
+
+        // --- Part 2: Inner Monologue ---
+        { type: "stand", who: "hero", direction: "down", time: 500 },
+        { type: "walk", who: "hero", direction: "down", time: 500 },
+        { type: "walk", who: "hero", direction: "down", time: 500 },
+
+        { type: "textMessage", text: '<i>The letter feels heavier than paper should.</i>' },
+        { type: "textMessage", text: '<i>Three days ago, it arrived without a return address.</i>'},
+        { type: "textMessage", text: '<i>"Help them move on," it said.</i>' },
+        { type: "textMessage", text: `<i>"They need someone who can see." </i>` },
+        { type: "textMessage", text: '<i>I\'ve handled strange cases before, but something about this one... it feels like the pen strokes are reaching into me.</i>'},
+      ])
+
+      
+        // --- Part 3: Add the center text display ---
+        .then(() => {
+          // Check if the method exists before calling
+          if (window.overworld && typeof window.overworld.showCenterText === 'function') {
+              window.overworld.showCenterText("Enter the Hotel", 4000);
+          }
+        })
+        .catch(err => {
+            // Error during cutscene occurred (logging removed)
+        });
+      } // End if (window.overworld && window.overworld.map)
+    } // End handleLetterClick
+
+  // Add click event to the letter icon
+  if (letterIcon) {
+    letterIcon.addEventListener("click", handleLetterClick);
+  }
+});

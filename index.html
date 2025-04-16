@@ -8,13 +8,48 @@
     <link href="/styles/ReverseMenu.css" type="text/css" rel="stylesheet">
     <link href="/styles/InventoryMenu.css" type="text/css" rel="stylesheet">
     <link href="/styles/NotebookMenu.css" rel="stylesheet" />
+    <link href="/styles/Letter.css" rel="stylesheet" />
 
+    <style>
+      @font-face {
+        font-family: "RedAlert";
+        src: url("/images/fonts/RedAlert.ttf") format("truetype");
+        font-weight: normal;
+        font-style: normal;
+      }
+    
+      body {
+        font-family: "RedAlert", sans-serif;
+      }
+    
+      .TextMessage_p {
+        font-family: "RedAlert", sans-serif;
+      }
+    
+      .TextMessage_p span.inner {
+        font-style: italic;
+        color: #888;
+      }
+    
+      .TextMessage_p span.ghost {
+        font-style: italic;
+        color: #b0e0e6;
+      }
+    
+      .TextMessage_p span.bold {
+        font-weight: bold;
+      }
+    </style>
+    
   </head>
   <body>
     <div class="game-container">
       <canvas class="game-canvas" width="352" height="198"></canvas>
       <div id="notebook-icon" class="NotebookIcon" title="Open Notebook"></div>
+      <div id="letter-icon" class="letter-icon"></div>
     </div>
+    
+    <div class="center-text-container"></div>
 
     <!-- Scripts -->
     <script src="/utils.js"></script>

@@ -1,0 +1,24 @@
+/* Letter Icon Styles */
+.letter-icon {
+    width: 20px;
+    height: 20px;
+    background-image: url('/images/icons/Envelop.png'); /* Create or get this image */
+    background-size: contain;
+    position: absolute;
+    left: 14px; /* Changed from right: 20px to left: 20px */
+    bottom: 140px; /* Position it below the notebook icon */
+    cursor: pointer;
+    z-index: 100;
+    animation: shake 0.8s infinite;
+    border-radius: 4px;
+    /* Removed the box-shadow property that was creating the glowing effect */
+  }
+  
+  /* Shaking Animation */
+  @keyframes shake {
+    0% { transform: rotate(0deg); }
+    25% { transform: rotate(5deg); }
+    50% { transform: rotate(0deg); }
+    75% { transform: rotate(-5deg); }
+    100% { transform: rotate(0deg); }
+  }
