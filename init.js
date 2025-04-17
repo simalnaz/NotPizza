@@ -66,9 +66,26 @@
     //Cheat for debugging
     document.addEventListener("keydown", (e) => {
       if (e.key === "L") {
-        overworld.startMap(window.OverworldMaps.Lobby);
+        overworld.startMap(window.OverworldMaps.HauntedLobby);
       }
+      // Cheat to mark all chapters as completed (flags only)
+      if (e.key === "P") { // 'P' for Progress
+        console.log("Activating 'Mark All Chapters Complete' cheat...");
 
+        // --- Mark Chapters as Completed ---
+        utils.gameProgress.chapter1Completed = true;
+        utils.gameProgress.chapter2Completed = true;
+        utils.gameProgress.chapter3Completed = true;
+
+        // --- Feedback ---
+        alert("All chapters marked as complete!");
+        console.log("Cheat activated. Game progress flags set:", utils.gameProgress);
+
+        // Optional: Refresh Notebook if it's open to show the updated status
+        if (window.notebookMenu && window.notebookMenu.element.classList.contains('visible')) {
+             window.notebookMenu.renderTab(window.notebookMenu.activeTab);
+        }
+      }
       if (e.key === "K") {
         window.elliotShouldFade = true;
         utils.gameProgress.chapter1Completed = true;

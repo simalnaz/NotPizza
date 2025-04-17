@@ -225,6 +225,7 @@ class OverworldMap {
 
   checkForActionCutscene() {
     const hero = this.gameObjects["hero"];
+    if (!hero) return;
     const nextCoords = utils.nextPosition(hero.x, hero.y, hero.direction);
     const match = Object.values(this.gameObjects).find(object => {
       return `${object.x},${object.y}` === `${nextCoords.x},${nextCoords.y}`
@@ -452,10 +453,86 @@ window.OverworldMaps = {
             text: `<i>Thornfield Hotel. Been abandoned for what, twenty years? Yet someone's keeping those roses alive.</i>`
           }
         ]
-      }]
-    },
-    // walls: { ... } // <-- REMOVED
+      }],
+      [utils.asGridCoord(25, 31)]: [
+        {
+          events: [
+            {
+              type: "callback",
+              callback: function () {
+                const realMap = window.overworld.map;
+              
+                console.log("🎯 Entered callback in Garden");
+                console.log("chapter1Completed:", utils.gameProgress.chapter1Completed);
+                console.log("chapter2Completed:", utils.gameProgress.chapter2Completed);
+                console.log("chapter3Completed:", utils.gameProgress.chapter3Completed);
+                console.log("npc1 already exists?", !!realMap.gameObjects["npc1"]);
+              
+                if (
+                  utils.gameProgress.chapter1Completed &&
+                  utils.gameProgress.chapter2Completed &&
+                  utils.gameProgress.chapter3Completed &&
+                  !realMap.gameObjects["npc1"]
+                ) {
+                  console.log("✅ Spawning npc1 for endgame");
+              
+                  realMap.gameObjects["npc1"] = new Person({
+                      id: "npc1",
+                      x: utils.withGrid(25), // maybe one tile to the right of hero
+                      y: utils.withGrid(30),
+                      src: "/images/characters/people/npc1.png",
+                      behaviorLoop: [
+                        { type: "stand", direction: "left", time: 800 },
+                        { type: "stand", direction: "right", time: 800 }
+                      ],
+                      talking: [
+                        {
+                          events:[
+                          { type: "textMessage", text: "<i>The letter promised I could help them. It never promised I would survive the process.</i>" },
+                          { type: "textMessage", text: "<g>Beautiful, aren't they? I've tended them for fifty years. Before and after.</g>", faceHero: "npc1" },
+                          { type: "textMessage", text: "I can't leave." },
+                          { type: "textMessage", text: "<g>No. Not yet. Not until you've given everything. Then you'll join us.</g>", faceHero: "npc1" },
+                          { type: "textMessage", text: "And if I refuse to give any more?" },
+                          { type: "textMessage", text: "<g>Then you'll remain as you are. Half here, half there. Never whole in either world.</g>", faceHero: "npc1" },
+                          { type: "textMessage", text: "<i>The case I couldn't solve. The price I couldn't anticipate. Every ghost I help takes another piece. Until there's nothing left but...</i>" },
+             
+                          { type: "textMessage", text: "...but an echo of what remains." },
+                        
+                          { type: "textMessage", text: "<g>Are you ready to finish this? To give the final piece?</g>", faceHero: "npc1" },
+                          { type: "textMessage", text: "What's left to give?" },
+                          { type: "textMessage", text: "<g>Your identity. Your name. The essence of who you are.</g>", faceHero: "npc1" },
+                          { type: "textMessage", text: "<i>The ultimate sacrifice. To be forgotten. To forget oneself.</i>" },
+                          { type: "textMessage", text: "I give you my name. My self. Take it and be free." },
+             
+                          { type: "textMessage", text: "<g>Thank you. We can all move on now.</g>", faceHero: "npc1" },
+               
+                          { type: "textMessage", text: "<i>A warmth leaves your chest... and something you once were, no longer is. You've moved on.</i>" },
+                          { type: "removeObject", objectId: "hero" },
+{
+  type: "callback",
+  callback: () => {
+    const endScreen = document.getElementById("game-end-screen");
+    if (endScreen) {
+      endScreen.style.opacity = "1";
+    }
+  }
+}
+
+                        ]
+                      }
+                    ]
+                  });
+                  realMap.gameObjects["npc1"].mount(realMap);
+      
+                  //map.addWall(utils.withGrid(26), utils.withGrid(31)); // Optional
+                }
+              }
+            },
+          ]
+        }
+      ]
   },
+  },   
 
   Lobby: {
     id: "Lobby",
@@ -622,11 +699,25 @@ Hallway: {
         [utils.asGridCoord(1, 20)]: [
           {
             events: [
-              { type: "changeMap", map: "Lobby" }
+              (map) => {
+                if (
+                  utils.gameProgress.chapter1Completed &&
+                  utils.gameProgress.chapter2Completed &&
+                  utils.gameProgress.chapter3Completed
+                ) {
+                  return [
+                    { type: "changeMap", map: "HauntedLobby" }
+                  ];
+                } else {
+                  return [
+                    { type: "changeMap", map: "Lobby" }
+                  ];
+                }
+              }
             ]
           }
         ]
-      },
+      }        
       // walls: { ... } // <-- REMOVED
     },
 
@@ -683,8 +774,14 @@ Hallway: {
                       { type: "textMessage", text: "<g>My name. They've forgotten my name. All those years being somebody, and now... no one remembers who I was.</g>", faceHero: npcId },
                       { type: "textMessage", text: "<i>There's a guestbook nearby. Maybe I can find her there.</i>" },
                       { type: "textMessage", text: "I'll come back for you." },
-                      { type: "textMessage", text: "<g>They all say that, darling.</g>", faceHero: npcId }
-                    ];
+                      { type: "textMessage", text: "<g>They all say that, darling.</g>", faceHero: npcId },
+                      {
+                        type: "callback",
+                        callback: () => {
+                          utils.identifyGhost("Marilyn");
+                        }
+                      },
+              ];
                   }
                 }
               ]
@@ -1072,6 +1169,14 @@ Hallway: {
                 { type: "textMessage", text: "<i>The linked list puzzle. Reconstructing a life story in reverse.</i>" },
                 { type: "textMessage", text: "How do I help her?" },
                 { type: "textMessage", text: "<g>Find the fragments. Connect them. Beginning to end. Or in her case, end to beginning. She needs to remember her story in the right order to let it go.</g>", faceHero: "npc1" },
+                { // <<< ADDED: Trigger Chapter 3 title
+                  type: "callback",
+                  callback: () => {
+                    if (window.overworld && typeof window.overworld.showCenterText === 'function') {
+                      window.overworld.showCenterText("Chapter 3:  The Backward Tale", 4000);
+                    }
+                  }
+                }
               ]
             }
           ]
@@ -1098,5 +1203,64 @@ Hallway: {
           }
         ]
       }
-    }
-  }    
+    },
+    HauntedLobby: {
+      id: "HauntedLobby",
+      lowerSrc: "/images/maps/HauntedLobbyLower.png",
+      upperSrc: "/images/maps/HauntedLobbyUpper.png",
+      collisionMaskSrc: "/images/maps/HauntedLobbyCollisionMask.png",
+    
+      gameObjects: {
+        hero: new Person({
+          isPlayerControlled: true,
+          x: utils.withGrid(50),
+          y: utils.withGrid(15),
+        }),
+        Charlie: new Person({
+          x: utils.withGrid(25),
+          y: utils.withGrid(17),
+          src: "/images/characters/people/charlie.png",
+          talking: [
+            {
+              events: [
+                { type: "textMessage", text: "<i>I feel hollow. Pieces gone. Duty. Ambition. What remains?</i>" },
+                { type: "textMessage", text: "<g>You've done well. Three of them gone. Peaceful now.</g>", faceHero: "Charlie" },
+                { type: "textMessage", text: "What's happening to me?" },
+                { type: "textMessage", text: "<g>The exchange. Your essence for their freedom. They needed parts of the living to complete themselves for the journey.</g>", faceHero: "Charlie" },
+                { type: "textMessage", text: "And what do I get in return?" },
+                { type: "textMessage", text: "<g>Understanding. The privilege of knowing what lies between.</g>", faceHero: "Charlie" },
+                { type: "textMessage", text: "That's not enough." },
+                { type: "textMessage", text: "<g>It was never about what you would receive. Only what you would give.</g>", faceHero: "Charlie" },
+                { type: "textMessage", text: "<g>You can leave now. Take what remains of yourself and go.</g>", faceHero: "Charlie" },
+                { type: "textMessage", text: "<i>I should feel angry. Foster's rage should be boiling over. But I feel... nothing. Empty spaces where emotions should be.</i>" },
+                { type: "textMessage", text: "I'm becoming like them." },
+                { type: "textMessage", text: "<g>Yes. The more you give, the less remains. Another ghost for the Thornfield Hotel.</g>", faceHero: "Charlie" },
+                { type: "textMessage", text: "<i>Too late. Too many pieces gone.</i>" }
+              ]
+            }
+          ]
+        }),
+      },
+    
+      entryPoints: {
+        "ChangedHallway": utils.asGridCoord(50, 15),
+      },
+    
+      cutsceneSpaces: {
+        [utils.asGridCoord(50, 15)]: [
+          {
+            events: [
+              { type: "textMessage", text: "<i>Can't go back now...<i>" },
+            ]
+          }
+        ],
+        [utils.asGridCoord(25, 38)]: [
+          {
+            events: [
+              { type: "changeMap", map: "Garden" }
+            ]
+          }
+        ]
+      }
+    } 
+  }
