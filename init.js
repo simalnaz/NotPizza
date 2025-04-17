@@ -26,28 +26,28 @@
     new GhostName({
       x: utils.withGrid(5),
       y: utils.withGrid(5),
-      src: "/images/characters/people/thomas.png", // Adjust image path as needed
+      src: "/images/characters/people/thomas.png",
       rememberedDetail: "49th of anniversary with his wife",
       id: "ghost4",
     }),
     new GhostName({
       x: utils.withGrid(29),
       y: utils.withGrid(42),
-      src: "/images/characters/people/eleanor.png", // Adjust image path as needed
+      src: "/images/characters/people/eleanor.png",
       rememberedDetail: "dedicated her life to love",
       id: "ghost5",
     }),
     new GhostName({
       x: utils.withGrid(11),
       y: utils.withGrid(27),
-      src: "/images/characters/people/reginald.png", // Adjust image path as needed
+      src: "/images/characters/people/reginald.png",
       rememberedDetail: "complains, every day, every second",
       id: "ghost6",
     }),
     new GhostName({
       x: utils.withGrid(4),
       y: utils.withGrid(12),
-      src: "/images/characters/people/marilyn.png", // Adjust image path as needed
+      src: "/images/characters/people/marilyn.png",
       rememberedDetail: "sees the world black and white",
       id: "ghost7",
     }),
@@ -59,49 +59,64 @@
   });
 
   window.overworld = overworld; // Make it global
-  overworld.init().catch(console.error);
   
-  window.keyArrayDisplay.init();
-
-    //Cheat for debugging
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "L") {
-        overworld.startMap(window.OverworldMaps.HauntedLobby);
-      }
-      // Cheat to mark all chapters as completed (flags only)
-      if (e.key === "P") { // 'P' for Progress
-        console.log("Activating 'Mark All Chapters Complete' cheat...");
-
-        // --- Mark Chapters as Completed ---
-        utils.gameProgress.chapter1Completed = true;
-        utils.gameProgress.chapter2Completed = true;
-        utils.gameProgress.chapter3Completed = true;
-
-        // --- Feedback ---
-        alert("All chapters marked as complete!");
-        console.log("Cheat activated. Game progress flags set:", utils.gameProgress);
-
-        // Optional: Refresh Notebook if it's open to show the updated status
-        if (window.notebookMenu && window.notebookMenu.element.classList.contains('visible')) {
-             window.notebookMenu.renderTab(window.notebookMenu.activeTab);
-        }
-      }
-      if (e.key === "K") {
-        window.elliotShouldFade = true;
-        utils.gameProgress.chapter1Completed = true;
-        utils.keyCollection.keysFound = ["Iron Master Key", "Silver Room Key", "Gold Safe Key"];
-        alert("Chapter 1 complete cheat activated");
-      }
-    });
-  
-  // Initialize NotebookMenu (This is fine here)
+  // Initialize NotebookMenu
   const notebookMenu = new NotebookMenu();
   notebookMenu.init(document.querySelector(".game-container"));
 
   document.getElementById("notebook-icon").addEventListener("click", () => {
     notebookMenu.toggle();
   });
+  
+  // Create and display the opening screen
+  const openingScreen = new OpeningScreen();
+  openingScreen.mount(document.querySelector(".game-container"));
+  
+  // Set callback for when the player clicks the start button
+  openingScreen.onStart(() => {
+    // Initialize the game after the opening screen is closed
+    overworld.init().catch(console.error);
+    window.keyArrayDisplay.init();
+    
+    // Show the letter icon if it's at the beginning of the game
+    if (!window.letterRead) {
+      const letterIcon = document.getElementById("letter-icon");
+      if (letterIcon) {
+        letterIcon.style.display = "block";
+      }
+    }
+  });
 
+  //Cheat for debugging
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "L") {
+      overworld.startMap(window.OverworldMaps.HauntedLobby);
+    }
+    // Cheat to mark all chapters as completed (flags only)
+    if (e.key === "P") { // 'P' for Progress
+      console.log("Activating 'Mark All Chapters Complete' cheat...");
+
+      // --- Mark Chapters as Completed ---
+      utils.gameProgress.chapter1Completed = true;
+      utils.gameProgress.chapter2Completed = true;
+      utils.gameProgress.chapter3Completed = true;
+
+      // --- Feedback ---
+      alert("All chapters marked as complete!");
+      console.log("Cheat activated. Game progress flags set:", utils.gameProgress);
+
+      // Optional: Refresh Notebook if it's open to show the updated status
+      if (window.notebookMenu && window.notebookMenu.element.classList.contains('visible')) {
+           window.notebookMenu.renderTab(window.notebookMenu.activeTab);
+      }
+    }
+    if (e.key === "K") {
+      window.elliotShouldFade = true;
+      utils.gameProgress.chapter1Completed = true;
+      utils.keyCollection.keysFound = ["Iron Master Key", "Silver Room Key", "Gold Safe Key"];
+      alert("Chapter 1 complete cheat activated");
+    }
+  });
 })();
 
 document.addEventListener("DOMContentLoaded", function() {

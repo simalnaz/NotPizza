@@ -57,10 +57,14 @@ class OverworldEvent {
       obj.direction = utils.oppositeDirection(this.map.gameObjects["hero"].direction);
     }
 
+    console.log("Creating TextMessage for:", this.event.text);
     const message = new TextMessage({
       text: this.event.text,
-      onComplete: () => resolve()
-    })
+      onComplete: () => {
+        console.log("TextMessage onComplete called, resolving promise for:", this.event.text);
+        resolve();
+      }
+    });
     message.init( document.querySelector(".game-container") )
   }
 

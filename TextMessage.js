@@ -34,11 +34,15 @@ class TextMessage {
 
   done() {
 
+    console.log("TextMessage done() called. isDone:", this.revealingText.isDone);
+
     if (this.revealingText.isDone) {
       this.element.remove();
       this.actionListener.unbind();
+      console.log("Calling onComplete...");
       this.onComplete();
     } else {
+      console.log("Warping to done...");
       this.revealingText.warpToDone();
     }
   }

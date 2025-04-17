@@ -206,7 +206,10 @@ class OverworldMap {
         event: events[i],
         map: this,
       })
+      console.log(`Starting event: ${i}`, events[i].type);
       await eventHandler.init();
+      console.log(`Finished event: ${i}`, events[i].type);
+      
     }
 
     //if (event.type === "centerText") {
