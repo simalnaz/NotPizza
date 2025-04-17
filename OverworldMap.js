@@ -240,9 +240,14 @@ class OverworldMap {
           icon: match.sprite.image.src, // Use the key's image source as the icon
           stackable: false, // Keys usually aren't stackable
           quantity: 1
-        });
-        console.log(`[Inventory] Added "${keyId}" to inventory.`);
         
+        });
+
+        if (window.keyArrayDisplay) {
+          window.keyArrayDisplay.show();
+          window.keyArrayDisplay.refresh();
+        }
+      
         const foundText = `You found the ${keyId}!`;
         const keysRemaining = utils.keyCollection.totalKeys - utils.keyCollection.keysFound.length;
         const remainingText = keysRemaining > 0
@@ -264,7 +269,6 @@ class OverworldMap {
         if (utils.keyCollection.hasAllKeys()) {
           window.elliotShouldFade = true;
           utils.gameProgress.chapter1Completed = true;
-          console.log("Chapter 1 Completed flag SET to true!", utils.gameProgress.chapter1Completed);
         }
       }
     
@@ -273,19 +277,23 @@ class OverworldMap {
 
     if (window.elliotShouldFade && this.gameObjects["Elliot"]) {
       window.elliotShouldFade = false;
+
+      if (window.keyArrayDisplay) {
+        window.keyArrayDisplay.hide();
+      }
     
       this.startCutscene([
         { type: "textMessage", text: "You found all my keys!", faceHero: "Elliot" },
         { type: "textMessage", text: "Now I can finally pass on to the afterlife..." },
         { type: "textMessage", text: "Thank you for your help!" },
-        { who: "Elliot", type: "walk", direction: "up" },
-        { who: "Elliot", type: "stand", direction: "up", time: 500 },
+        { who: "Elliot", type: "walk", direction: "down", time: 500},
+        { who: "Elliot", type: "walk", direction: "down", time: 500 },
         { type: "textMessage", text: "Elliot's ghost fades away peacefully..." },
         { type: "removeObject", objectId: "Elliot" },
         { type: "textMessage", text: "You feel a warm breeze... the ghost has moved on." }
       ]);
     
-      return; // prevent other NPC logic from running
+      return; 
     } 
 
     // --- GhostName Interaction Logic ---

@@ -159,3 +159,57 @@ body {
   background: #cc0000;
 }
 
+.key-array-ui {
+  position: absolute;
+  bottom: 150px;
+  left: 230px;
+  display: flex;
+  gap: 3px;
+  background: rgba(0, 0, 0, 0.45);
+  padding: 4px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  z-index: 1000;
+}
+
+.key-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 31px;
+  height: 31px;
+  padding: 2px;
+  border: 1px solid #666;
+  border-radius: 3px;
+  font-size: 8px;
+}
+
+.key-slot.empty {
+  background-color: #111;
+  color: #666;
+}
+
+.key-slot.occupied {
+  background-color: #30577a;
+  color: #fff;
+}
+
+.index-label {
+  font-size: 7px;
+  color: #aaa;
+  line-height: 1;
+}
+
+.key-content {
+  margin-top: 1px;
+  text-align: center;
+  word-break: break-word;
+  font-size: 8px;
+  line-height: 1.1;
+}
+.key-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  margin-top: 2px;
+}

@@ -60,6 +60,9 @@
 
   window.overworld = overworld; // Make it global
   overworld.init().catch(console.error);
+  
+  window.keyArrayDisplay.init();
+
   //Cheat for debugging
   document.addEventListener("keydown", (e) => {
     if (e.key === "L") {
