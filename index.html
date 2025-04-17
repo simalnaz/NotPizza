@@ -52,29 +52,40 @@
     
     <div class="center-text-container"></div>
 
-    <!-- Scripts -->
+    <!-- CORE UTILITIES & BASE CLASSES (Load First) -->
     <script src="/utils.js"></script>
-    <script src="/KeyArrayDisplay.js"></script>
-    <script src="/NotebookMenu.js"></script>
-    <script src="/Inventory.js"></script>
-    <script src="/InventoryMenu.js"></script>
-    <script src="/DirectionInput.js"></script>
-    <script src="/Overworld.js"></script>
-    <script src="/GameObject.js"></script>
-    <script src="/ReverseMenu.js"></script>
-    <script src="/Person.js"></script>
     <script src="/Sprite.js"></script>
-    <script src="/Key.js"></script>
-    <script src="/Ghost.js"></script>
-    <script src="/GhostName.js"></script>
-    <script src="/GuestBook.js"></script>
-    <script src="/NameGuessingMenu.js"></script>
-    <script src="/OverworldMap.js"></script>
+    <script src="/GameObject.js"></script>
+
+    <!-- DERIVED GAME OBJECT CLASSES (Depend on GameObject/Sprite) -->
+    <script src="/Person.js"></script>       <!-- <<< MUST BE LOADED -->
+    <script src="/Ghost.js"></script>        <!-- Depends on Person -->
+    <script src="/GhostName.js"></script>    <!-- Depends on Ghost -->
+    <script src="/Key.js"></script>          <!-- Depends on GameObject -->
+
+    <!-- MAPS & EVENTS (Depend on GameObject subclasses) -->
+    <script src="/OverworldMap.js"></script> <!-- Uses Person, Key, Book, GhostName -->
+    <script src="/Overworld.js"></script>
     <script src="/OverworldEvent.js"></script>
+
+    <!-- UI & TEXT CLASSES -->
+    <script src="/RevealingText.js"></script>
     <script src="/TextMessage.js"></script>
     <script src="/KeyPressListener.js"></script>
-    <script src="/RevealingText.js"></script>
-    <script src="/init.js"></script>
+    <script src="/Inventory.js"></script>     <!-- Define Inventory before Menus -->
+    <script src="/InventoryMenu.js"></script>
+    <script src="/GuestBook.js"></script>     <!-- Define GuestBook before Menus -->
+    <script src="/NameGuessingMenu.js"></script>
+    <script src="/KeyArrayDisplay.js"></script>
+    <script src="/NotebookMenu.js"></script>
+    <script src="/ReverseMenu.js"></script>   <!-- Depends on utils -->
+
+    <!-- INPUT & MAIN GAME LOGIC -->
+    <script src="/DirectionInput.js"></script>    <!-- Uses OverworldMap, DirectionInput, etc. -->
+
+    <!-- INITIALIZATION (Load Last) -->
+    <script src="/init.js"></script>          <!-- Uses Overworld, GhostName, Maps etc. -->
+
 
   </body>
 </html>

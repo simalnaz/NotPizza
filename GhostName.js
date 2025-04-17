@@ -10,6 +10,11 @@ class GhostName extends Ghost {
         this.hasBeenIdentified = false;
         this.lockoutEndTime = null; // NEW: Timestamp for when lockout ends
 
+                // --- NEW: Initial Dialogue Handling ---
+                this.initialTalking = config.initialTalking || null; // Store initial dialogue sequence
+                this.initialDialogueDone = false; // Flag to track if initial talk happened
+                // --- END NEW ---
+
         // Set up dialogue based on remembered detail
         this.updateTalking();
     }
@@ -32,18 +37,24 @@ class GhostName extends Ghost {
 
     updateTalking() {
         const now = Date.now();
-
-        // 1. Check if identified
+    
         if (this.hasBeenIdentified) {
+            // --- NEW ENDING SEQUENCE ---
             this.talking = [{
                 events: [
-                    { type: "textMessage", text: `Thank you for helping me remember! My name is ${this.realName}.`, faceHero: this.id },
-                    { type: "textMessage", text: "Now I can finally rest in peace..." },
-                    { who: this.id, type: "stand", direction: "up", time: 1000 },
-                    { type: "textMessage", text: `${this.realName}'s ghost fades away peacefully...` },
-                    { type: "removeObject", objectId: this.id }
+                    // Initial "Thank you" is handled by the NameGuessingMenu success message now.
+                    // Start directly with the peace message.
+                    { type: "textMessage", text: "Ah... yes. That's it. Thank you.", faceHero: this.id }, // Optional slightly different phrasing
+                    { type: "textMessage", text: "Now I can finally rest..." },
+                    // Message indicating the ghost is fading
+                    { type: "textMessage", text: `${this.realName}'s form shimmers and fades away peacefully...` },
+                    // Remove the object from the map
+                    { type: "removeObject", objectId: this.id },
+                    // Optional: Add a concluding message like Elliot's
+                    { type: "textMessage", text: "You feel a sense of calm wash over the room..." }
                 ]
             }];
+
         // 2. Check if currently locked out
         } else if (this.lockoutEndTime && now < this.lockoutEndTime) {
             const remainingMs = this.lockoutEndTime - now;
@@ -51,7 +62,7 @@ class GhostName extends Ghost {
             const remainingMinutes = Math.floor(remainingSeconds / 60);
             const displaySeconds = remainingSeconds % 60;
             const timeString = `${remainingMinutes}m ${displaySeconds}s`;
-
+    
             this.talking = [{
                 events: [
                     { type: "textMessage", text: "The ghost seems weary from your guesses...", faceHero: this.id },
@@ -59,24 +70,44 @@ class GhostName extends Ghost {
                 ]
             }];
             console.log(`[GhostName] UpdateTalking: Lockout active for ${this.id}. Remaining: ${timeString}`);
-        // 3. Not identified, not locked out -> Default guessing dialogue
+    
+        // --- NEW: 3. Check if initial dialogue needs to be played ---
+        } else if (!this.initialDialogueDone && this.initialTalking) {
+            // Clone the initial events array to avoid modifying the original config
+            let initialEvents = [...this.initialTalking[0].events];
+    
+            // Add a callback event at the end to mark initial dialogue as done
+            // and immediately update talking again to switch to guessing mode
+            initialEvents.push({
+                type: "callback",
+                callback: () => {
+                    console.log(`[GhostName] Initial dialogue finished for ${this.id}. Setting initialDialogueDone = true.`);
+                    this.initialDialogueDone = true;
+                    this.updateTalking(); // Re-run updateTalking to set the guessing dialogue
+                }
+            });
+    
+            // Set the current talking sequence to the initial events + callback
+            this.talking = [{ events: initialEvents }];
+            console.log(`[GhostName] UpdateTalking: Setting initial dialogue for ${this.id}.`);
+        // --- END NEW ---
+    
+        // 4. Not identified, not locked out, initial dialogue done (or no initial dialogue) -> Default guessing dialogue
         } else {
             // If lockout just expired, clear the timestamp
-            if (this.lockoutEndTime) {
+            if (this.lockoutEndTime && now >= this.lockoutEndTime) { // Check if lockout actually expired
                 console.log(`[GhostName] UpdateTalking: Lockout expired for ${this.id}.`);
                 this.lockoutEndTime = null;
+                this.guessAttempts = 0; // Reset attempts when lockout expires
             }
-            // Reset guess attempts if lockout expired (or never started)
-            // this.guessAttempts = 0; // Resetting here might be too aggressive, let checkNameGuess handle it.
-
+    
             this.talking = [{
                 events: [
-                    { type: "textMessage", text: "I... I can't remember my name...", faceHero: this.id },
-                    { type: "textMessage", text: `All I remember is that I ${this.rememberedDetail}...` },
-                    { type: "textMessage", text: "Can you help me? I need to know who I was." },
+                    { type: "textMessage", text: "<g>Can you help me? I need to know who I was.<g>" },
                     { type: "nameGuess", ghostId: this.id } // Triggers the NameGuessingMenu
                 ]
             }];
+             console.log(`[GhostName] UpdateTalking: Setting guessing dialogue for ${this.id}.`);
         }
     }
 

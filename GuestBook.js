@@ -41,25 +41,25 @@ class GuestBook {
       },
       "Thomas Henderson": {
         room: 304,
-        description: "wears a navy blue suit",
+        description: "49th of anniversary with his wife",
         yearVisited: 1938,
         disappeared: false
       },
       "Eleanor Henderson": {
         room: 305,
-        description: "has a pearl necklace",
+        description: "dedicated her life to love",
         yearVisited: 1938,
         disappeared: false
       },
       "Reginald Foster": {
         room: 421,
-        description: "smokes a wooden pipe",
+        description: "complains, every day, every second",
         yearVisited: 1912,
         disappeared: false
       },
       "Marilyn Winters": {
         room: 156,
-        description: "carries a red umbrella",
+        description: "sees the world black and white",
         yearVisited: 1957,
         disappeared: false
       }

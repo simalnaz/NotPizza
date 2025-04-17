@@ -1,3 +1,6 @@
+// /Users/simal/Desktop/Detective/Person.js
+// REMOVED: state.map.moveWall(...) from startBehavior method
+
 class Person extends GameObject {
   constructor(config) {
     super(config);
@@ -37,10 +40,10 @@ class Person extends GameObject {
   startBehavior(state, behavior) {
     //Set character direction to whatever behavior has
     this.direction = behavior.direction;
-    
+
     if (behavior.type === "walk") {
       //Stop here if space is not free
-      if (state.map.isSpaceTaken(this.x, this.y, this.direction)) {
+      if (state.map.isSpaceTaken(this.x, this.y, this.direction)) { // <-- KEPT: Checks against collision mask data
 
         behavior.retry && setTimeout(() => {
           this.startBehavior(state, behavior)
@@ -50,7 +53,7 @@ class Person extends GameObject {
       }
 
       //Ready to walk!
-      state.map.moveWall(this.x, this.y, this.direction);
+      // state.map.moveWall(this.x, this.y, this.direction); // <-- REMOVED
       this.movingProgressRemaining = 8;
     }
 

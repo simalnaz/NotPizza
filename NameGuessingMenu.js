@@ -1,12 +1,13 @@
 class NameGuessingMenu {
   constructor({ ghostId, onComplete }) {
     this.ghostId = ghostId;
-    this.onComplete = onComplete;
+    this.onComplete = onComplete; // This function now expects a result (ghost or null)
     this.element = null;
     this.nameInput = null;
     this.guestBookElement = null;
     this.isGuestBookOpen = false;
   }
+
 
   createElement() {
     // Create main container
@@ -137,78 +138,72 @@ class NameGuessingMenu {
       this.isGuestBookOpen = true;
     }
   }
-  
   makeGuess() {
     const guessedName = this.nameInput.value.trim();
-    
+
     if (!guessedName) {
-      // Display error if no name entered
       this.showMessage("Please enter a name.");
       return;
     }
-    
-    // Get the ghost object
+
     const ghost = utils.getGameObjectByIdFromAnyMap(this.ghostId);
-    
+
     if (!ghost || typeof ghost.checkNameGuess !== "function") {
       this.showMessage("Something went wrong with this ghost.");
-      setTimeout(() => {
-        this.close();
-      }, 2000);
+      // Don't close automatically, let OverworldEvent handle it via onComplete(null)
+      this.onComplete(null); // Signal failure/error
       return;
     }
-    
-    // Process the guess
+
     const result = ghost.checkNameGuess(guessedName);
 
     if (result.success) {
-      // 1. Update ghost state on success
+      // 1. Update ghost state
       ghost.hasBeenIdentified = true;
 
-      const activeGhosts = ["ghost1", "ghost2", "ghost3"];
-      const allIdentified = activeGhosts.every(id => {
-        const g = utils.getGameObjectByIdFromAnyMap(id);
-        return g?.hasBeenIdentified;
-      });
-      if (allIdentified) {
-        utils.gameProgress.chapter2Completed = true;
-      }
-
-
-      // 2. Mark the ghost as disappeared in the Guest Book
-      //    (Make sure ghost.realName was set correctly during mount)
+      // 2. Mark in guest book
       if (ghost.realName) {
           window.guestBook.markAsDisappeared(ghost.realName);
       }
 
-      // 3. Update the ghost's talking array for the next interaction
+      // 3. Check Chapter 2 completion (Keep this logic)
+      const chapter2Ghosts = ["ghost1", "ghost2", "ghost3", "ghost4", "ghost5", "ghost6", "ghost7"];
+      const allChapter2Identified = chapter2Ghosts.every(id => {
+          const g = utils.getGameObjectByIdFromAnyMap(id);
+          return !g || (g && g.hasBeenIdentified);
+      });
+      if (allChapter2Identified && !utils.gameProgress.chapter2Completed) {
+          utils.gameProgress.chapter2Completed = true;
+          console.log("Chapter 2 marked as completed!");
+      }
+
+      // 4. Update the ghost's talking array to the ending sequence
       ghost.updateTalking();
 
-      // 4. Show success message
-      this.showMessage(result.message);
+      // 5. Show success message (Still useful feedback)
+      this.showMessage(result.message); // Show the "Yes! I remember..." message
 
-      // 5. Close menu after a delay
-      setTimeout(() => {
-        this.close();
-      }, 2000); // Keep the delay
-
+      // 6. ***MODIFIED***: Call onComplete with the ghost object immediately
+      //    Let the OverworldEvent handle closing the menu and starting the next sequence.
+      this.onComplete(ghost); // Pass the identified ghost back
     } else {
-      // 1. Update ghost state on failure
-      //ghost.guessAttempts += 1;
+      // --- Failure logic ---
+      // 1. Update the ghost's state (attempts, potential lockout) and dialogue
+      //    checkNameGuess already increments attempts and sets lockoutEndTime if needed.
+      //    updateTalking will set the appropriate dialogue (lockout message or standard guess prompt)
+      //    for the *next* interaction, but we don't need it for the current message.
+      //    ghost.updateTalking(); // Calling this might prematurely show lockout message if attempts just hit max
 
-      // 2. Update the ghost's talking array (this might switch it to the "max attempts" state)
-      ghost.updateTalking();
+      // 2. Show the failure message returned by checkNameGuess
+      this.showMessage(result.message); // Shows "No... that doesn't sound right." OR the lockout message
 
-      // 3. Show failure message
-      this.showMessage(result.message);
-
-      // Optional: Clear the input field after a wrong guess
+      // 3. Clear the input field so the player can type a new guess
       this.nameInput.value = "";
 
-      // Optional: Check if max attempts reached and close the menu if desired
-       if (ghost.guessAttempts >= ghost.maxGuessAttempts) {
-         setTimeout(() => { this.close(); }, 2000);
-       }
+      // 4. ***REMOVED***: Do NOT call onComplete here.
+      //    The menu should stay open, displaying the message, until the player
+      //    either guesses correctly or clicks Cancel.
+      // this.onComplete(null); // <-- Line removed
     }
   }
   
@@ -237,14 +232,19 @@ class NameGuessingMenu {
     this.element.remove();
     
     // Call the onComplete callback
-    this.onComplete();
+    //this.onComplete();
   }
 
   init(container) {
     this.createElement();
+
+    // ***MODIFIED***: Add listener for Cancel button to call onComplete(null)
+    this.element.querySelector(".NameGuessingMenu_button--cancel").addEventListener("click", () => {
+        this.onComplete(null); // Signal cancellation
+    });
+
     container.appendChild(this.element);
-    
-    // Focus the name input
+
     setTimeout(() => {
       this.nameInput.focus();
     }, 10);

@@ -75,6 +75,13 @@ class Overworld {
   }
  
   async startMap(mapConfig, sourceMapId = null) {
+
+        // --- DEBUGGING ---
+        console.log(`[Overworld.startMap] Called.`);
+        console.log(`  Received mapConfig:`, mapConfig); // Check what's actually received
+        console.log(`  Received sourceMapId: ${sourceMapId}`);
+        // --- END DEBUGGING ---
+        
     if (!mapConfig) {
       console.error(`startMap called with invalid mapConfig (maybe map name "${this.event?.map}" doesn't exist in window.OverworldMaps?)`);
       // Potentially stop the process or load a default map
@@ -157,7 +164,8 @@ class Overworld {
   }
  
   async init() {
-    await this.startMap(window.OverworldMaps.Garden); // ✔️ Harita yüklenmeden devam etme
+    await this.startMap(window.OverworldMaps.Garden);
+
   
     this.bindActionInput();
     this.bindHeroPositionCheck();

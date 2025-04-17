@@ -114,7 +114,7 @@ class ReverseMenu {
   }
 
   checkSolution() {
-    const correctOrder = ["node1", "node2", "node3", "node4"];
+    const correctOrder = ["node1", "node2", "node3", "node4", "node5", "node6"];
     const currentIds = this.linkedList.map(n => n.id);
     
     // Update attempts counter

@@ -26,29 +26,29 @@
     new GhostName({
       x: utils.withGrid(5),
       y: utils.withGrid(5),
-      src: "/images/characters/people/npc1.png", // Adjust image path as needed
-      rememberedDetail: "wears a navy blue suit",
+      src: "/images/characters/people/thomas.png", // Adjust image path as needed
+      rememberedDetail: "49th of anniversary with his wife",
       id: "ghost4",
     }),
     new GhostName({
-      x: utils.withGrid(8),
-      y: utils.withGrid(9),
-      src: "/images/characters/people/npc3.png", // Adjust image path as needed
-      rememberedDetail: "has a pearl necklace",
+      x: utils.withGrid(29),
+      y: utils.withGrid(42),
+      src: "/images/characters/people/eleanor.png", // Adjust image path as needed
+      rememberedDetail: "dedicated her life to love",
       id: "ghost5",
     }),
     new GhostName({
-      x: utils.withGrid(15),
-      y: utils.withGrid(6),
-      src: "/images/characters/people/npc5.png", // Adjust image path as needed
-      rememberedDetail: "smokes a wooden pipe",
+      x: utils.withGrid(11),
+      y: utils.withGrid(27),
+      src: "/images/characters/people/reginald.png", // Adjust image path as needed
+      rememberedDetail: "complains, every day, every second",
       id: "ghost6",
     }),
     new GhostName({
       x: utils.withGrid(4),
       y: utils.withGrid(12),
-      src: "/images/characters/people/npc6.png", // Adjust image path as needed
-      rememberedDetail: "carries a red umbrella",
+      src: "/images/characters/people/marilyn.png", // Adjust image path as needed
+      rememberedDetail: "sees the world black and white",
       id: "ghost7",
     }),
   ];
@@ -63,26 +63,19 @@
   
   window.keyArrayDisplay.init();
 
-  //Cheat for debugging
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "L") {
-      overworld.startMap(window.OverworldMaps.Lobby);
-    }
-    if (e.key === "K") {
-      window.elliotShouldFade = true;
-      utils.gameProgress.chapter1Completed = true;
-      utils.keyCollection.keysFound = ["Iron Master Key", "Silver Room Key", "Gold Safe Key"];
-      alert("Chapter 1 complete cheat activated");
-    }
-    if (e.key === "i") {
-      overworld.startMap(window.OverworldMaps.Hallway);
-    }
-    // Add a debug key for testing ghost identification
-    if (e.key === "G") {
-      utils.identifyGhost("Elliot");
-      alert("Identified Elliot!");
-    }
-  });
+    //Cheat for debugging
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "L") {
+        overworld.startMap(window.OverworldMaps.Lobby);
+      }
+
+      if (e.key === "K") {
+        window.elliotShouldFade = true;
+        utils.gameProgress.chapter1Completed = true;
+        utils.keyCollection.keysFound = ["Iron Master Key", "Silver Room Key", "Gold Safe Key"];
+        alert("Chapter 1 complete cheat activated");
+      }
+    });
   
   // Initialize NotebookMenu (This is fine here)
   const notebookMenu = new NotebookMenu();
