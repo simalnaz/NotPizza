@@ -44,9 +44,16 @@ class TextMessage {
   }
 
   init(container) {
+    console.log("[TextMessage] init() called with text:", this.text);
     this.createElement();
     container.appendChild(this.element);
-    this.revealingText.init();
+  
+    requestAnimationFrame(() => {
+      console.log("[TextMessage] Calling revealingText.init()");
+      this.revealingText.init();
+    });
   }
+  
+  
 
 }

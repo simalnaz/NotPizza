@@ -50,19 +50,22 @@ class OverworldEvent {
     }
     document.addEventListener("PersonWalkingComplete", completeHandler)
   }
-
   textMessage(resolve) {
+    console.log("[OverworldEvent] textMessage triggered:", this.event.text);
+  
     if (this.event.faceHero) {
       const obj = this.map.gameObjects[this.event.faceHero];
       obj.direction = utils.oppositeDirection(this.map.gameObjects["hero"].direction);
     }
-
+  
     const message = new TextMessage({
       text: this.event.text,
       onComplete: () => resolve()
-    })
-    message.init( document.querySelector(".game-container") )
+    });
+  
+    message.init(document.querySelector(".game-container"));
   }
+  
 
   changeMap(resolve) {
     const mapName = this.event.map;

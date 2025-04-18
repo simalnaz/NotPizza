@@ -488,6 +488,7 @@ window.OverworldMaps = {
                       talking: [
                         {
                           events:[
+                            { type: "textMessage", text: "<g>entire sentence here</g>"},
                           { type: "textMessage", text: "<i>The letter promised I could help them. It never promised I would survive the process.</i>" },
                           { type: "textMessage", text: "<g>Beautiful, aren't they? I've tended them for fifty years. Before and after.</g>", faceHero: "npc1" },
                           { type: "textMessage", text: "I can't leave." },

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    .TextMessage_p span {
+      display: inline;
+      white-space: pre;
+      opacity: 0;
+      transition: opacity 0.1s linear;
+    }
+
+    .TextMessage_p span.revealed {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <p class="TextMessage_p"></p>
+
+  <script>
+    const text = "You... you can see me? Really see me?";
+    const element = document.querySelector(".TextMessage_p");
+
+    const chars = text.split("").map(char => {
+      const span = document.createElement("span");
+      span.textContent = char;
+      element.appendChild(span);
+      return span;
+    });
+
+    function reveal(i = 0) {
+      if (i >= chars.length) return;
+      chars[i].classList.add("revealed");
+      setTimeout(() => reveal(i + 1), 50);
+    }
+
+    reveal();
+  </script>
+</body>
+</html>

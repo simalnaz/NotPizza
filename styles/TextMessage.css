@@ -26,8 +26,13 @@
 }
 
 .TextMessage span {
+  display: inline-block;
+  white-space: pre;
   opacity: 0;
+  transition: opacity 0.05s linear;
+  min-width: 0.6ch;    /* ⬅️ Large space for testing */
 }
+
 
 .TextMessage span.revealed {
   opacity: 1;
