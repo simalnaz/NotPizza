@@ -19,8 +19,8 @@ class OpeningScreen {
     
     const content = `
       <div class="title-container">
-        <h1 class="game-title">THE GRAND SPECTRE HOTEL</h1>
-        <h2 class="game-subtitle">A Detective Lumen Mystery</h2>
+        <h1 class="game-title">THE GRAND THORNFIELD HOTEL</h1>
+        <h2 class="game-subtitle">A Detective Mystery</h2>
       </div>
       <div class="description">
         <p>Trapped spirits. Forgotten memories. Unfinished business.</p>
@@ -239,14 +239,6 @@ document.addEventListener("DOMContentLoaded", function() {
         z-index: 1;
       }
 
-      /* Ghost decorations */
-      .ghost-decorations {
-        position: relative;
-        width: 100%;
-        height: 24px;
-        margin-top: 12px;
-      }
-
       .ghost {
         position: absolute;
         width: 16px;
@@ -256,18 +248,6 @@ document.addEventListener("DOMContentLoaded", function() {
         background-repeat: no-repeat;
         animation: ghostFlicker 3s infinite;
         opacity: 0.7;
-      }
-
-      .ghost-left {
-        left: 40px;
-        top: 0;
-        background-image: url('/images/characters/people/npc4.png');
-      }
-
-      .ghost-right {
-        right: 40px;
-        top: 0;
-        background-image: url('/images/characters/people/npc2.png');
       }
 
       /* Button pulse animation */
